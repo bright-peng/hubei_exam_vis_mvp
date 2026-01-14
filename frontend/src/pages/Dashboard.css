@@ -104,6 +104,13 @@
   text-overflow: ellipsis;
 }
 
+.position-code {
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  color: #a78bfa;
+  margin-bottom: 2px;
+}
+
 .position-meta {
   font-size: 0.75rem;
   color: var(--text-muted);

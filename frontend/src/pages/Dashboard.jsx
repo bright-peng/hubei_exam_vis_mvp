@@ -201,7 +201,8 @@ export default function Dashboard() {
                   <div key={pos.code || idx} className="position-item">
                     <div className="position-rank surge">{idx + 1}</div>
                     <div className="position-info">
-                      <div className="position-name">{pos.name || pos.unit}</div>
+                      <div className="position-code">{pos.code}</div>
+                      <div className="position-name" title={pos.name || pos.unit}>{pos.name || pos.unit}</div>
                       <div className="position-meta">
                         {pos.unit || ''} · {pos.city || ''}
                       </div>
@@ -232,7 +233,8 @@ export default function Dashboard() {
                 <div key={pos.职位代码 || idx} className="position-item">
                   <div className="position-rank hot">{idx + 1}</div>
                   <div className="position-info">
-                    <div className="position-name">{pos.职位名称 || pos.招录机关}</div>
+                    <div className="position-code">{pos.职位代码}</div>
+                    <div className="position-name" title={pos.职位名称 || pos.招录机关}>{pos.职位名称 || pos.招录机关}</div>
                     <div className="position-meta">
                       {pos.用人单位 || ''} · {pos.工作地点 || ''}
                     </div>
@@ -262,7 +264,8 @@ export default function Dashboard() {
                 <div key={pos.职位代码 || idx} className="position-item">
                   <div className="position-rank cold">{idx + 1}</div>
                   <div className="position-info">
-                    <div className="position-name">{pos.职位名称 || pos.招录机关}</div>
+                    <div className="position-code">{pos.职位代码}</div>
+                    <div className="position-name" title={pos.职位名称 || pos.招录机关}>{pos.职位名称 || pos.招录机关}</div>
                     <div className="position-meta">
                       {pos.用人单位 || ''} · {pos.工作地点 || ''}
                     </div>

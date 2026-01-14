@@ -67,6 +67,7 @@ const filterPositions = (data, params) => {
     if (params.keyword) {
         const k = params.keyword.toLowerCase()
         result = result.filter(p =>
+            (p['职位代码'] && String(p['职位代码']).includes(k)) ||
             (p['职位名称'] && p['职位名称'].includes(k)) ||
             (p['招录机关'] && p['招录机关'].includes(k)) ||
             (p['用人单位'] && p['用人单位'].includes(k)) ||

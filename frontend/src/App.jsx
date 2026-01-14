@@ -48,10 +48,12 @@ export default function App() {
               <span className="nav-icon">📋</span>
               职位表
             </NavLink>
+            {/* 静态部署模式下隐藏上传入口
             <NavLink to="/upload" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
               <span className="nav-icon">📤</span>
               数据上传
             </NavLink>
+            */}
           </nav>
         </div>
       </header>

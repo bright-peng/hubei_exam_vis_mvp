@@ -12,7 +12,7 @@ export default function PositionList() {
   const [selectedPosition, setSelectedPosition] = useState(null)
   
   // 筛选条件
-  const [selectedCity, setSelectedCity] = useState('')
+  const [selectedCity, setSelectedCity] = useState('武汉市')
   const [selectedEducation, setSelectedEducation] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [keyword, setKeyword] = useState('')
@@ -64,7 +64,7 @@ export default function PositionList() {
   }
 
   const handleReset = () => {
-    setSelectedCity('')
+    setSelectedCity('武汉市')
     setSelectedEducation('')
     setSelectedDate('')
     setKeyword('')

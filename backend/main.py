@@ -37,19 +37,22 @@ os.makedirs(DAILY_DIR, exist_ok=True)
 
 # 字段映射 - 将实际字段映射到标准字段
 POSITION_FIELD_MAP = {
-    '机构名称': '招录机关',
-    '招录机关': '用人单位',
-    '招录职位': '职位名称',
     '职位代码': '职位代码',
-    '招录数量': '招录人数',
+    '招录机关': '招录机关',
+    '用人单位': '用人单位',
+    '职位名称': '职位名称',
+    '招录人数': '招录人数',
+    '工作地点': '工作地点',
     '学历': '学历',
     '学位': '学位',
-    '机构层级': '工作地点',  # 用机构层级代替工作地点
-    '研究生专业': '专业',
+    '研究生专业': '研究生专业',
     '本科专业': '本科专业',
-    '备注': '备注',
+    '专业': '本科专业',
     '招录对象': '招录对象',
-    '户籍要求': '户籍要求',
+    '备注': '备注',
+    '职位简介': '职位简介',
+    '城市': '城市',
+    '区县': '区县'
 }
 
 DAILY_FIELD_MAP = {
@@ -59,54 +62,122 @@ DAILY_FIELD_MAP = {
 }
 
 
-def clean_region_name(name: str) -> str:
-    """清理地区名称"""
-    if pd.isna(name):
-        return "未知"
-    return str(name).strip()
+# 湖北省各地市及其下属区县映射（增强匹配，需与 GeoJSON 名称一致）
+CITY_DISTRICT_MAP = {
+    "武汉市": ["江岸区", "江汉区", "硚口区", "汉阳区", "武昌区", "青山区", "洪山区", "东西湖区", "汉南区", "蔡甸区", "江夏区", "黄陂区", "新洲区", "东湖高新区", "东湖开发区", "武汉经开区", "长江新区", "市直", "东湖风景区"],
+    "黄石市": ["黄石港区", "西塞山区", "下陆区", "铁山区", "大冶市", "阳新县"],
+    "十堰市": ["茅箭区", "张湾区", "郧阳区", "郧西县", "竹山县", "竹溪县", "房县", "丹江口市", "武当山"],
+    "宜昌市": ["西陵区", "伍家岗区", "点军区", "猇亭区", "夷陵区", "远安县", "兴山县", "秭归县", "长阳县", "五峰县", "宜都市", "当阳市", "枝江市", "宜昌高新区"],
+    "襄阳市": ["襄城区", "樊城区", "襄州区", "南漳县", "谷城县", "保康县", "枣阳市", "宜城市", "老河口市", "鱼梁洲", "东津新区"],
+    "鄂州市": ["鄂城区", "华容区", "梁子湖区", "葛店", "临空经济区"],
+    "荆门市": ["东宝区", "掇刀区", "京山市", "沙洋县", "钟祥市", "屈家岭"],
+    "孝感市": ["孝南区", "孝昌县", "大悟县", "云梦县", "应城市", "安陆市", "汉川市"],
+    "荆州市": ["沙市区", "荆州区", "公安县", "江陵县", "松滋市", "石首市", "洪湖市", "监利市", "沙市"],
+    "黄冈市": ["黄州区", "团风县", "红安县", "罗田县", "英山县", "浠水县", "蕲春县", "黄梅县", "麻城市", "武穴市"],
+    "咸宁市": ["咸安区", "嘉鱼县", "通城县", "崇阳县", "通山县", "赤壁市"],
+    "随州市": ["曾都区", "随县", "广水市"],
+    "恩施土家族苗族自治州": ["恩施市", "利川市", "建始县", "巴东县", "宣恩县", "咸丰县", "来凤县", "鹤峰县", "恩施"],
+    "仙桃市": ["仙桃"],
+    "潜江市": ["潜江"],
+    "天门市": ["天门"],
+    "神农架林区": ["神农架"]
+}
 
+def normalize_city_and_district(org_name: str, raw_city: str = None, raw_district: str = None):
+    """
+    规整化城市和区县信息
+    返回 (city, district)
+    """
+    org = str(org_name) if not pd.isna(org_name) else ""
+    city = str(raw_city) if not pd.isna(raw_city) else ""
+    district = str(raw_district) if not pd.isna(raw_district) else ""
+    
+    # 1. 识别省直
+    if "省" in org[:4] or org.startswith("省") or city == "省直":
+        return "省直", "其他"
+    
+    # 2. 如果原始城市名已经在 CITY_DISTRICT_MAP 的 key 里，保持原样
+    if city in CITY_DISTRICT_MAP:
+        # 如果 raw_city 是武汉市，但 raw_district 为空，尝试从 org 提取
+        if not district or district == "其他":
+            for d in CITY_DISTRICT_MAP[city]:
+                if d in org:
+                    district = d
+                    break
+        return city, district or "其他"
 
-def extract_city_from_org(org_name: str) -> str:
-    """
-    从机构名称提取城市/地区
-    例如: "武汉市人大常委会" -> "武汉市"
-          "省人大常委会办公厅" -> "省直"
-    """
-    if pd.isna(org_name):
-        return "未知"
+    # 3. 如果 org 或 city 中包含明确的市名
+    for main_city in CITY_DISTRICT_MAP.keys():
+        short_city = main_city.replace("市", "").replace("州", "").replace("林区", "")
+        if short_city in city or short_city in org:
+            # 进一步细化区县
+            for d in CITY_DISTRICT_MAP[main_city]:
+                if d in district or d in org or d in city:
+                    return main_city, d
+            return main_city, district or "其他"
+            
+    # 4. 反向搜索：如果 org, city, district 中包含任何已知的区县关键词
+    for main_city, districts in CITY_DISTRICT_MAP.items():
+        for d in districts:
+            # 先尝试全名匹配
+            if d in org or d in city or d in district:
+                 return main_city, d
+            # 再尝试去后缀匹配（仅限长度 >= 2 的词，防止误伤，如“房”县不宜去后缀匹配）
+            short_d = d.replace("区", "").replace("县", "").replace("市", "")
+            if len(short_d) >= 2:
+                if short_d in org or short_d in city or short_d in district:
+                    return main_city, d
+                    
+    # 5. 特殊处理：以“市”开头的机关（通常是武汉市直）
+    if org.startswith("市") or city.startswith("市"):
+        return "武汉市", "市直"
+        
+    # 6. 最后保底模糊识别
+    if "武汉" in org or "武汉" in city: return "武汉市", "市直"
+    if "黄石" in org: return "黄石市", "其他"
+    if "十堰" in org: return "十堰市", "其他"
+    if "宜昌" in org: return "宜昌市", "其他"
+    if "襄阳" in org: return "襄阳市", "其他"
+    if "荆门" in org: return "荆门市", "其他"
+    if "荆州" in org: return "荆州市", "其他"
+    if "黄冈" in org: return "黄冈市", "其他"
+    if "孝感" in org: return "孝感市", "其他"
+    if "咸宁" in org: return "咸宁市", "其他"
+    if "随州" in org: return "随州市", "其他"
+    if "恩施" in org: return "恩施土家族苗族自治州", "其他"
+    if "仙桃" in org or "仙桃" in city: return "仙桃市", "仙桃"
+    if "潜江" in org or "潜江" in city: return "潜江市", "潜江"
+    if "天门" in org or "天门" in city: return "天门市", "天门"
+    if "神农架" in org or "神农架" in city: return "神农架林区", "神农架"
     
-    org = str(org_name).strip()
-    
-    # 省级机关
-    if org.startswith('省') or '省委' in org or '省政府' in org:
-        return "省直"
-    
-    # 提取市名
-    city_pattern = r'^([\u4e00-\u9fa5]+(?:市|州))'
-    match = re.match(city_pattern, org)
-    if match:
-        return match.group(1)
-    
-    # 提取区/县名
-    district_pattern = r'^([\u4e00-\u9fa5]+(?:区|县|林区))'
-    match = re.match(district_pattern, org)
-    if match:
-        return match.group(1)
-    
-    return org[:4] if len(org) >= 4 else org
+    return city or "未知", district or "其他"
 
 
 def standardize_position_df(df: pd.DataFrame) -> pd.DataFrame:
     """标准化职位表字段"""
+    # 清理列名（去除空格、换行符）
+    df.columns = [str(c).strip() for c in df.columns]
+    
     # 创建新的标准化DataFrame
     std_df = pd.DataFrame()
     
-    # 映射字段
+    # 1. 尝试直接映射已知字段
     for orig_col, std_col in POSITION_FIELD_MAP.items():
         if orig_col in df.columns:
             std_df[std_col] = df[orig_col]
+        # 模糊匹配
+        else:
+            for actual_col in df.columns:
+                if orig_col in actual_col and std_col not in std_df.columns:
+                    std_df[std_col] = df[actual_col]
+                    break
     
-    # 确保关键字段存在
+    # 2. 特殊处理：如果 std_df 还是缺某些关键列，从 df 中同名列补充
+    for col in ['职位代码', '招录机关', '用人单位', '职位名称', '招录人数', '学历', '学位', '城市', '区县']:
+        if col not in std_df.columns and col in df.columns:
+            std_df[col] = df[col]
+
+    # 3. 确保关键字段存在
     if '职位代码' not in std_df.columns:
         std_df['职位代码'] = range(1, len(df) + 1)
     
@@ -115,17 +186,29 @@ def standardize_position_df(df: pd.DataFrame) -> pd.DataFrame:
     else:
         std_df['招录人数'] = pd.to_numeric(std_df['招录人数'], errors='coerce').fillna(1)
     
-    # 从机构名称提取城市信息
-    if '招录机关' in std_df.columns:
-        std_df['城市'] = std_df['招录机关'].apply(extract_city_from_org)
-    else:
-        std_df['城市'] = "未知"
+    # 4. 提取或填充城市信息
+    std_df['norm_info'] = std_df.apply(
+        lambda x: normalize_city_and_district(
+            x.get('招录机关', ''), 
+            x.get('城市', None), 
+            x.get('区县', None)
+        ), axis=1
+    )
     
-    # 合并专业字段
-    if '专业' not in std_df.columns or std_df['专业'].isna().all():
-        if '本科专业' in std_df.columns:
-            std_df['专业'] = std_df['本科专业']
+    std_df['城市'] = std_df['norm_info'].apply(lambda x: x[0])
+    std_df['区县'] = std_df['norm_info'].apply(lambda x: x[1])
+    std_df.drop(columns=['norm_info'], inplace=True)
     
+    # 6. 处理专业字段合并
+    if '研究生专业' not in std_df.columns:
+        std_df['研究生专业'] = ""
+    if '本科专业' not in std_df.columns:
+        # 如果有名为“专业”的列，当作本科专业
+        if '专业' in df.columns:
+            std_df['本科专业'] = df['专业']
+        else:
+            std_df['本科专业'] = ""
+            
     return std_df
 
 
@@ -182,7 +265,14 @@ async def upload_positions(file: UploadFile = File(...)):
             "cities": sorted(std_df['城市'].unique().tolist()),
         }
         
-        return {"status": "success", "message": "职位表上传并入库成功", "stats": stats}
+        # 触发静态数据导出
+        try:
+            from export_static import export_all
+            export_all()
+        except Exception as e:
+            print(f"Warning: Static export failed: {e}")
+            
+        return {"status": "success", "message": "职位表上传并入库成功，静态数据已更新", "stats": stats}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"上传失败: {str(e)}")
 
@@ -215,7 +305,14 @@ async def upload_daily(
             "total_applicants": int(std_df['报名人数'].sum()),
         }
         
-        return {"status": "success", "message": f"{report_date} 报名数据上传并入库成功", "stats": stats}
+        # 触发静态数据导出
+        try:
+            from export_static import export_all
+            export_all()
+        except Exception as e:
+            print(f"Warning: Static export failed: {e}")
+
+        return {"status": "success", "message": f"{report_date} 报名数据上传并入库成功，静态数据已更新", "stats": stats}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"上传失败: {str(e)}")
 
@@ -267,6 +364,7 @@ async def get_positions(
             'target': '招录对象',
             'notes': '备注',
             'intro': '职位简介',
+            'applicants': '报名人数',
             'passed': '审核通过人数',
             'competition_ratio': '竞争比'
         })
@@ -348,8 +446,16 @@ async def get_wuhan_positions(
             'unit': '用人单位',
             'quota': '招录人数',
             'city': '城市',
-            'competition_ratio': '竞争比',
-            'applicants': '报名人数'
+            'education': '学历',
+            'degree': '学位',
+            'major_pg': '研究生专业',
+            'major_ug': '本科专业',
+            'target': '招录对象',
+            'notes': '备注',
+            'intro': '职位简介',
+            'applicants': '报名人数',
+            'passed': '审核通过人数',
+            'competition_ratio': '竞争比'
         })
         
         return {
@@ -532,8 +638,13 @@ async def get_hot_positions(limit: int = 10, date: Optional[str] = None):
         'city': '城市',
         'education': '学历',
         'degree': '学位',
-        'major_ug': '专业',
+        'major_pg': '研究生专业',
+        'major_ug': '本科专业',
+        'target': '招录对象',
+        'notes': '备注',
+        'intro': '职位简介',
         'applicants': '报名人数',
+        'passed': '审核通过人数',
         'competition_ratio': '竞争比'
     })
     return {
@@ -574,8 +685,13 @@ async def get_cold_positions(limit: int = 10, date: Optional[str] = None):
         'city': '城市',
         'education': '学历',
         'degree': '学位',
-        'major_ug': '专业',
+        'major_pg': '研究生专业',
+        'major_ug': '本科专业',
+        'target': '招录对象',
+        'notes': '备注',
+        'intro': '职位简介',
         'applicants': '报名人数',
+        'passed': '审核通过人数',
         'competition_ratio': '竞争比'
     })
     return {
@@ -633,31 +749,41 @@ async def get_summary(date: Optional[str] = None):
 @app.get("/filters")
 async def get_filters():
     """获取可用的筛选条件"""
-    if not os.path.exists(POSITION_FILE):
-        return {"cities": [], "districts": {}, "education": [], "degree": []}
+    # 优先使用 CITY_DISTRICT_MAP 中的标准城市列表
+    cities = ["省直"] + sorted(list(CITY_DISTRICT_MAP.keys()))
     
-    df = pd.read_excel(POSITION_FILE)
+    # 学历和学位信息可以从数据库中动态获取，或者保持读取 Excel (如果数据库没初始化)
+    education = []
+    degree = []
     
-    result = {
-        "cities": [],
-        "districts": {},
-        "education": [],
-        "degree": []
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        # 获取所有学历
+        cursor.execute("SELECT DISTINCT education FROM positions WHERE education != '' AND education IS NOT NULL")
+        education = sorted([row[0] for row in cursor.fetchall()])
+        
+        # 获取所有学位
+        cursor.execute("SELECT DISTINCT degree FROM positions WHERE degree != '' AND degree IS NOT NULL")
+        degree = sorted([row[0] for row in cursor.fetchall()])
+        
+        conn.close()
+    except Exception as e:
+        print(f"Error fetching filters from DB: {e}")
+        # 保底方案：如果数据库有问题且 Excel 存在，从 Excel 读取
+        if os.path.exists(POSITION_FILE):
+             df = pd.read_excel(POSITION_FILE)
+             if '学历' in df.columns:
+                 education = sorted([e for e in df['学历'].dropna().unique().tolist() if e])
+             if '学位' in df.columns:
+                 degree = sorted([d for d in df['学位'].dropna().unique().tolist() if d])
+
+    return {
+        "cities": cities,
+        "education": education,
+        "degree": degree
     }
-    
-    # 城市
-    if '城市' in df.columns:
-        result["cities"] = sorted([c for c in df['城市'].dropna().unique().tolist() if c])
-    
-    # 学历
-    if '学历' in df.columns:
-        result["education"] = sorted([e for e in df['学历'].dropna().unique().tolist() if e])
-    
-    # 学位
-    if '学位' in df.columns:
-        result["degree"] = sorted([d for d in df['学位'].dropna().unique().tolist() if d])
-    
-    return result
 
 
 if __name__ == "__main__":

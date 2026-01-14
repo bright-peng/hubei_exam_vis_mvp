@@ -57,6 +57,10 @@ def save_positions(df):
     # Mapping
     data = []
     for _, row in df.iterrows():
+        # Skip invalid codes
+        if row['code'].lower() == 'nan':
+            continue
+            
         data.append((
             row['code'],
             row.get('职位名称', ''),
@@ -92,8 +96,13 @@ def save_applications(df, report_date):
     
     data = []
     for _, row in df.iterrows():
+        code = row['code']
+        # Skip invalid codes or "Total" rows
+        if not code or code.lower() == 'nan' or code == '合计':
+            continue
+            
         data.append((
-            row['code'],
+            code,
             report_date,
             int(row.get('报名人数', 0)),
             int(row.get('审核通过人数', 0))

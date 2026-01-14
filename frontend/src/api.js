@@ -141,10 +141,29 @@ export const getPositions = async (params) => {
 
 export const getStatsByRegion = async (date) => {
     if (USE_STATIC_DATA) {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/map_data.json')
+        // Compute from positions data for the specified date
+        const positions = await loadStaticPositions(date)
+
+        // Group by city
+        const cityMap = {}
+        positions.forEach(p => {
+            const city = p['城市'] || '未知'
+            if (!cityMap[city]) {
+                cityMap[city] = { name: city, positions: 0, quota: 0, applicants: 0 }
+            }
+            cityMap[city].positions += 1
+            cityMap[city].quota += parseInt(p['招录人数']) || 0
+            cityMap[city].applicants += parseInt(p['报名人数']) || 0
+        })
+
+        const cities = Object.values(cityMap)
+        cities.forEach(c => {
+            c.competition_ratio = c.quota > 0 ? Math.round((c.applicants / c.quota) * 10) / 10 : 0
+        })
+
         return {
-            cities: res.data.province,
-            date: res.data.date
+            cities: cities,
+            date: date || '最新数据'
         }
     }
     return api.get('/stats/by-region', { params: { date } })
@@ -194,8 +213,27 @@ export const getColdPositions = async (limit = 20, date = null) => {
 
 export const getSummary = async (date) => {
     if (USE_STATIC_DATA) {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/summary.json')
-        return res.data
+        // Always load base summary for daily_files list
+        const summaryRes = await axios.get(import.meta.env.BASE_URL + 'data/summary.json')
+        const baseSummary = summaryRes.data
+
+        // If a specific date is requested, compute stats from that date's position data
+        if (date) {
+            const positions = await loadStaticPositions(date)
+            const total_positions = positions.length
+            const total_quota = positions.reduce((sum, p) => sum + (parseInt(p['招录人数']) || 0), 0)
+            const total_applicants = positions.reduce((sum, p) => sum + (parseInt(p['报名人数']) || 0), 0)
+
+            return {
+                ...baseSummary,
+                total_positions,
+                total_quota,
+                total_applicants,
+                date: date
+            }
+        }
+
+        return baseSummary
     }
     return api.get('/stats/summary', { params: { date } })
 }
@@ -219,11 +257,27 @@ export const getAvailableDates = async () => {
 // 武汉专项接口
 export const getWuhanDistricts = async (date) => {
     if (USE_STATIC_DATA) {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/map_data.json')
-        // 原 API 是返回 { data: [...], total_... }
-        // getWuhanDistricts 前端调用: data.data || []
-        // 需要计算总计
-        const wuhanData = res.data.wuhan
+        // Compute from positions data for the specified date
+        const positions = await loadStaticPositions(date)
+        const wuhanPositions = positions.filter(p => p['城市'] === '武汉市')
+
+        // Group by district
+        const districtMap = {}
+        wuhanPositions.forEach(p => {
+            const district = p['district'] || '其他'
+            if (!districtMap[district]) {
+                districtMap[district] = { name: district, positions: 0, quota: 0, applicants: 0 }
+            }
+            districtMap[district].positions += 1
+            districtMap[district].quota += parseInt(p['招录人数']) || 0
+            districtMap[district].applicants += parseInt(p['报名人数']) || 0
+        })
+
+        const wuhanData = Object.values(districtMap)
+        wuhanData.forEach(d => {
+            d.competition_ratio = d.quota > 0 ? Math.round((d.applicants / d.quota) * 10) / 10 : 0
+        })
+
         const totalPos = wuhanData.reduce((acc, cur) => acc + cur.positions, 0)
         const totalQuota = wuhanData.reduce((acc, cur) => acc + cur.quota, 0)
         const totalApp = wuhanData.reduce((acc, cur) => acc + cur.applicants, 0)
@@ -233,7 +287,7 @@ export const getWuhanDistricts = async (date) => {
             total_positions: totalPos,
             total_quota: totalQuota,
             total_applicants: totalApp,
-            date: res.data.date
+            date: date || '最新数据'
         }
     }
     return api.get('/stats/wuhan-districts', { params: { date } })

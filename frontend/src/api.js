@@ -194,7 +194,7 @@ export const getFilters = async () => {
 export const getAvailableDates = async () => {
     if (USE_STATIC_DATA) {
         const res = await axios.get(import.meta.env.BASE_URL + 'data/summary.json')
-        return { dates: res.data.daily_files || [] }
+        return res.data.daily_files || []
     }
     return api.get('/stats/dates')
 }

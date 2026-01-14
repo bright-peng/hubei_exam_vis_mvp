@@ -772,7 +772,7 @@ async def get_filters():
     degree = []
     
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = get_db_connection()
         cursor = conn.cursor()
         
         # 获取所有学历

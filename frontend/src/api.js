@@ -362,7 +362,7 @@ export const getTrendByCodes = async (codes) => {
             // Get data
             const data = trends[code] || new Array(dates.length).fill(0)
 
-            result.append ? result.append({ code, name, data }) : result.push({ code, name, data })
+            result.push({ code, name, data })
         }
 
         // Sort by latest value

@@ -185,7 +185,7 @@ export default function PositionList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {positions.map((pos) => {
+                  {(Array.isArray(positions) ? positions : []).map((pos) => {
                     const competition = pos.招录人数 > 0
                       ? (pos.报名人数 / pos.招录人数).toFixed(1)
                       : 0

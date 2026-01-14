@@ -42,7 +42,7 @@ export default function Dashboard() {
       if (!chartDom) return
 
       const chart = echarts.init(chartDom)
-      const data = trendData.data || []
+      const data = Array.isArray(trendData?.data) ? trendData.data : []
 
       chart.setOption({
         backgroundColor: 'transparent',

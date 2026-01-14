@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Routes, Route, NavLink } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import MapView from './pages/MapView'
@@ -7,9 +7,27 @@ import PositionList from './pages/PositionList'
 import DataUpload from './pages/DataUpload'
 import WuhanView from './pages/WuhanView'
 import WatchList from './pages/WatchList'
+import LockScreen from './components/LockScreen'
 import './App.css'
 
 export default function App() {
+  const [isLocked, setIsLocked] = useState(true)
+
+  useEffect(() => {
+    // 检查会话存储中是否有解锁标记
+    const unlocked = sessionStorage.getItem('app_unlocked') === 'true'
+    setIsLocked(!unlocked)
+  }, [])
+
+  const handleUnlock = () => {
+    sessionStorage.setItem('app_unlocked', 'true')
+    setIsLocked(false)
+  }
+
+  if (isLocked) {
+    return <LockScreen onUnlock={handleUnlock} />
+  }
+
   return (
     <div className="app">
       {/* 头部导航 */}

@@ -1,0 +1,85 @@
+.lock-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  z-index: 9999;
+}
+
+.lock-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.lock-card {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  padding: 40px;
+  backdrop-filter: blur(30px) !important;
+}
+
+.lock-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+}
+
+.lock-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.lock-card p {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+.lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.password-input {
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 4px;
+}
+
+.input-error {
+  border-color: var(--danger-color) !important;
+  animation: shake 0.4s ease-in-out;
+}
+
+.error-msg {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  margin-top: -10px;
+}
+
+.unlock-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}

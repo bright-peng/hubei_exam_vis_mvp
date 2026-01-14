@@ -1,0 +1,38 @@
+.date-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(30, 41, 59, 0.4);
+  padding: 6px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.1);
+}
+
+.date-selector-container label {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.date-select-dropdown {
+  background: rgba(15, 23, 42, 0.6);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 140px;
+}
+
+.date-select-dropdown:hover {
+  border-color: #fbbf24;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.date-select-dropdown option {
+  background: #1e293b;
+  color: #e2e8f0;
+}

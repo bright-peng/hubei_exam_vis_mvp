@@ -1,0 +1,28 @@
+# OS files
+.DS_Store
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Backend
+backend/__pycache__/
+backend/venv/
+backend/.env
+backend/.pytest_cache/
+backend/*.pyc
+
+# Data and Excel files
+*.xlsx
+*.xls
+data/*.db
+data/*.xlsx
+# If you want to keep the data directory structure but ignore files:
+# !data/.gitkeep
+
+# Local environment/IDE
+.vscode/
+.idea/
+*.log

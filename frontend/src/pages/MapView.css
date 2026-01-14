@@ -1,0 +1,196 @@
+/* MapView 样式 */
+
+.map-view {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--spacing-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+  height: calc(100vh - 160px);
+}
+
+.map-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+  position: relative;
+  padding: 20px;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  margin-bottom: 20px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.toggle-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.toggle-btn.active {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+.map-chart {
+  flex: 1;
+  min-height: 400px;
+}
+
+/* 侧边栏 */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  overflow: hidden;
+}
+
+.city-detail {
+  padding: var(--spacing-lg);
+}
+
+.city-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.city-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.city-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+}
+
+.city-stat .stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.city-stat .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.hint-card {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--spacing-lg);
+}
+
+/* 城市列表 */
+.city-list {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.city-items {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.city-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.city-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.city-item.selected {
+  background: rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.city-rank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.city-item-name {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.city-item-value {
+  font-weight: 600;
+  color: var(--primary-light);
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .map-view {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .map-container {
+    min-height: 400px;
+  }
+  
+  .sidebar {
+    flex-direction: row;
+  }
+  
+  .city-list {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    flex-direction: column;
+  }
+}

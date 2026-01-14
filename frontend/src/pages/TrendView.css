@@ -1,0 +1,116 @@
+/* TrendView 样式 */
+
+.trend-view {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.filter-item label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.filter-item .select {
+  min-width: 150px;
+}
+
+.filter-info {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.filter-info strong {
+  color: var(--primary-light);
+}
+
+/* 统计卡片 */
+.trend-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.stat-mini {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-mini .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-mini .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* 图表容器 */
+.chart-container {
+  padding: var(--spacing-lg);
+}
+
+.trend-chart {
+  height: 400px;
+  width: 100%;
+}
+
+/* 表格增强 */
+.positive {
+  color: #10b981 !important;
+}
+
+.negative {
+  color: #ef4444 !important;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .trend-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .filter-bar {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .trend-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .trend-chart {
+    height: 300px;
+  }
+}

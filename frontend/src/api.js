@@ -24,28 +24,28 @@ export default api
 
 // --- 静态模式辅助函数 ---
 let positionsCache = null
+let trendCache = null
 const loadStaticPositions = async () => {
     if (positionsCache) return positionsCache
     try {
         const res = await axios.get(import.meta.env.BASE_URL + 'data/positions.json')
-        // 预处理：字段映射（如果 python 导出的是中文 key，这里最好转一下，
-        // 但我们在 Python 脚本里导出时用了中文 key (为了和 Excel 对应?) 
-        // 不，查看 export_static.py，我们用了 rename alias，
-        // "职位代码", "职位名称"... 
-        // 前端组件用的 key 是什么？
-        // 查看 PositionList.jsx: pos.职位代码, pos.用人单位...
-        // 很好，前端直接用中文 Key。
-        // 但是后端 API (main.py) 返回的 JSON key 是 "code", "name"... 后来 rename 成了中文。
-        // 现在 positions.json 里也是中文 key.
-        // wait, main.py rename to '职位代码'...
-        // 所以 positions.json 里的 key 应该是中文。我检查一下 export_positions SQL alias.
-        // 是的，p.code as "职位代码".
-        // 所以可以直接用。
         positionsCache = res.data.data
         return positionsCache
     } catch (e) {
         console.error("Failed to load static positions", e)
         return []
+    }
+}
+
+const loadStaticTrends = async () => {
+    if (trendCache) return trendCache
+    try {
+        const res = await axios.get(import.meta.env.BASE_URL + 'data/trends_granular.json')
+        trendCache = res.data
+        return trendCache
+    } catch (e) {
+        console.error("Failed to load static trends", e)
+        return { dates: [], trends: {} }
     }
 }
 
@@ -246,4 +246,70 @@ export const getSurgePositions = async () => {
         console.warn("Surge data not found (maybe crawler hasn't run yet)", e)
         return { data: [], wuhan: [] }
     }
+}
+
+export const getPositionsByCodes = async (codes) => {
+    if (USE_STATIC_DATA) {
+        const all = await loadStaticPositions()
+        const uniqueCodes = [...new Set(codes)]
+
+        // Find positions
+        const filtered = all.filter(p => uniqueCodes.includes(String(p['职位代码'])))
+
+        // Add trend/competiton info if needed, but getPositionsByCodes usually just returns detailed pos info
+        // Main logic in backend: 
+        // df = df.merge(daily_df[['职位代码', '报名人数']], on='职位代码', how='left')
+        // static data already has latest applicants count in '报名人数'
+
+        // Sort by applicants desc
+        filtered.sort((a, b) => (b['报名人数'] || 0) - (a['报名人数'] || 0))
+
+        // Check not found
+        const found = new Set(filtered.map(p => String(p['职位代码'])))
+        const notFound = uniqueCodes.filter(c => !found.has(c))
+
+        return {
+            data: filtered,
+            total: filtered.length,
+            not_found: notFound,
+            latest_date: "静态数据"
+        }
+    }
+    return api.post('/positions/by-codes', codes)
+}
+
+export const getTrendByCodes = async (codes) => {
+    if (USE_STATIC_DATA) {
+        const uniqueCodes = [...new Set(codes)]
+        const trendData = await loadStaticTrends()
+        const allPositions = await loadStaticPositions()
+
+        const dates = trendData.dates || []
+        const trends = trendData.trends || {}
+
+        const result = []
+        for (const code of uniqueCodes) {
+            // Find name
+            const pos = allPositions.find(p => String(p['职位代码']) === code)
+            const name = pos ? (pos['职位名称'] || code) : code
+
+            // Get data
+            const data = trends[code] || new Array(dates.length).fill(0)
+
+            result.append ? result.append({ code, name, data }) : result.push({ code, name, data })
+        }
+
+        // Sort by latest value
+        result.sort((a, b) => {
+            const valA = a.data.length ? a.data[a.data.length - 1] : 0
+            const valB = b.data.length ? b.data[b.data.length - 1] : 0
+            return valB - valA
+        })
+
+        return {
+            positions: result,
+            dates: dates
+        }
+    }
+    return api.post('/positions/trend-by-codes', codes)
 }

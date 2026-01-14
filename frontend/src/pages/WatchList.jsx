@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import PositionDetailModal from '../components/PositionDetailModal';
 import './WatchList.css';
 
-const API_BASE = 'http://localhost:8000';
+import { getPositionsByCodes, getTrendByCodes } from '../api';
 
 // 默认关注的职位代码列表
 const DEFAULT_WATCH_CODES = [
@@ -58,12 +58,7 @@ function WatchList() {
   const fetchPositions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/positions/by-codes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(watchCodes)
-      });
-      const data = await res.json();
+      const data = await getPositionsByCodes(watchCodes);
       setPositions(data.data || []);
       setNotFound(data.not_found || []);
       setLatestDate(data.latest_date || '');
@@ -77,12 +72,7 @@ function WatchList() {
   const fetchTrendData = async () => {
     setTrendLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/positions/trend-by-codes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(watchCodes)
-      });
-      const data = await res.json();
+      const data = await getTrendByCodes(watchCodes);
       setTrendData(data);
     } catch (err) {
       console.error('获取趋势数据失败:', err);
@@ -95,7 +85,7 @@ function WatchList() {
     if (!trendData || !trendData.dates || trendData.dates.length === 0) {
       return [];
     }
-    
+
     return trendData.dates.map((date, index) => {
       const point = { date: date.slice(5) };
       trendData.positions.forEach(pos => {
@@ -146,8 +136,8 @@ function WatchList() {
     applicants: acc.applicants + (pos.报名人数 || 0),
   }), { quota: 0, applicants: 0 });
 
-  const avgRatio = totalStats.quota > 0 
-    ? (totalStats.applicants / totalStats.quota).toFixed(1) 
+  const avgRatio = totalStats.quota > 0
+    ? (totalStats.applicants / totalStats.quota).toFixed(1)
     : '0.0';
 
   const hasMultipleDays = trendData && trendData.dates && trendData.dates.length > 1;

@@ -306,6 +306,62 @@ def export_surge():
     
     conn.close()
 
+def export_granular_trend():
+    """Export trends for EACH position (code -> history) for static lookups"""
+    print("Exporting granular trend data...")
+    conn = get_db_connection()
+    
+    # Check if we have enough data
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT date FROM applications ORDER BY date")
+    dates = [r[0] for r in cursor.fetchall()]
+    
+    if not dates:
+        print("No dates found, skipping granular trend export")
+        conn.close()
+        return
+
+    # We need to build a map: code -> [applicants on date1, applicants on date2, ...]
+    # This could be large, but for ~5000 positions * ~10 days it's fine (~50k integers).
+    # If it gets huge, we might need to split files, but for now single file is OK.
+    
+    query = """
+    SELECT code, date, applicants
+    FROM applications
+    ORDER BY date
+    """
+    df = pd.read_sql_query(query, conn)
+    
+    # Pivot: index=code, columns=date, values=applicants
+    # We want to ensure all dates are present for each code? 
+    # Or just sparse? Frontend needs to align with `dates`.
+    # Let's align with `dates`.
+    
+    if df.empty:
+         trend_map = {}
+    else:
+        pivot = df.pivot(index='code', columns='date', values='applicants').fillna(0).astype(int)
+        # Ensure all columns exist
+        for d in dates:
+            if d not in pivot.columns:
+                pivot[d] = 0
+        
+        # Sort columns by date
+        pivot = pivot[dates]
+        
+        # Convert to dict: code -> list of ints
+        trend_map = pivot.T.to_dict(orient='list')
+        
+    result = {
+        "dates": dates,
+        "trends": trend_map
+    }
+    
+    with open(os.path.join(OUTPUT_DIR, "trends_granular.json"), 'w', encoding='utf-8') as f:
+        json.dump(result, f, ensure_ascii=False) # remove indent for size
+        
+    conn.close()
+
 def export_all():
     """Execute all export functions"""
     try:
@@ -316,6 +372,7 @@ def export_all():
         export_filters()
         export_maps()
         export_surge()
+        export_granular_trend()
         print("Static data export completed!")
         return True
     except Exception as e:

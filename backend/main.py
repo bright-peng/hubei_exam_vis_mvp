@@ -521,60 +521,72 @@ async def get_positions_by_codes(codes: List[str]):
 @app.post("/positions/trend-by-codes")
 async def get_trend_by_codes(codes: List[str]):
     """获取指定职位代码列表的多日报名趋势数据"""
-    if not os.path.exists(DAILY_DIR):
-        return {"data": [], "dates": [], "message": "暂无报名数据"}
-    
-    daily_files = sorted(os.listdir(DAILY_DIR))
-    if not daily_files:
-        return {"data": [], "dates": [], "message": "暂无报名数据"}
-    
-    # 去重
     unique_codes = list(set(codes))
+    if not unique_codes:
+        return {"positions": [], "dates": []}
     
-    # 加载职位表获取职位名称
-    pos_names = {}
-    if os.path.exists(POSITION_FILE):
-        pos_df = pd.read_excel(POSITION_FILE, dtype={'职位代码': str})
-        pos_df['职位代码'] = pos_df['职位代码'].astype(str)
-        for _, row in pos_df.iterrows():
-            if row['职位代码'] in unique_codes:
-                pos_names[row['职位代码']] = row.get('职位名称', row['职位代码'])
+    conn = get_db_connection()
     
-    # 收集每日数据
-    dates = []
-    trend_data = {code: [] for code in unique_codes}
+    # 1. Get position names
+    placeholders = ',' .join(['?'] * len(unique_codes))
+    query_pos = f"SELECT code, name FROM positions WHERE code IN ({placeholders})"
+    df_pos = pd.read_sql_query(query_pos, conn, params=unique_codes)
+    pos_map = dict(zip(df_pos['code'], df_pos['name']))
     
-    for f in daily_files:
-        file_date = f.replace('.xlsx', '')
-        dates.append(file_date)
-        
-        daily_df = pd.read_excel(os.path.join(DAILY_DIR, f), dtype={'职位代码': str})
-        daily_df['职位代码'] = daily_df['职位代码'].astype(str)
-        
-        # 获取每个职位的报名人数
-        for code in unique_codes:
-            matching = daily_df[daily_df['职位代码'] == code]
-            if len(matching) > 0 and '报名人数' in matching.columns:
-                applicants = int(matching['报名人数'].iloc[0])
-            else:
-                applicants = 0
-            trend_data[code].append(applicants)
+    # 2. Get applications data
+    # We need to make sure we query for these codes and group by date
+    query_app = f"""
+        SELECT code, date, applicants 
+        FROM applications 
+        WHERE code IN ({placeholders})
+        ORDER BY date
+    """
+    df_app = pd.read_sql_query(query_app, conn, params=unique_codes)
+    conn.close()
     
-    # 构建返回数据
+    if df_app.empty:
+         return {"positions": [], "dates": [], "message": "暂无报名数据"}
+    
+    # 3. Process data
+    # Get all unique dates from the result
+    all_dates = sorted(df_app['date'].unique())
+    
     result = []
-    for code in unique_codes:
-        result.append({
-            "code": code,
-            "name": pos_names.get(code, code),
-            "data": trend_data[code]
-        })
     
+    # Pivot the dataframe to get dates as generic index or similar structure
+    # Alternatively, just iterate. Pivot is cleaner.
+    if not df_app.empty:
+        pivot_df = df_app.pivot(index='date', columns='code', values='applicants').fillna(0).astype(int)
+        # Ensure all dates are present in the index (in case some days have NO data for ANY of the requested codes?? Unlikely if dates come from df_app itself)
+        # But we want to make sure the order is correct
+        pivot_df = pivot_df.reindex(all_dates, fill_value=0)
+        
+        for code in unique_codes:
+            if code in pivot_df.columns:
+                data_list = pivot_df[code].tolist()
+            else:
+                data_list = [0] * len(all_dates)
+                
+            result.append({
+                "code": code,
+                "name": pos_map.get(code, code),
+                "data": data_list
+            })
+    else:
+        # Should be covered by df_app.empty check above, but safe fallback
+        for code in unique_codes:
+            result.append({
+                "code": code,
+                "name": pos_map.get(code, code),
+                "data": []
+            })
+
     # 按最新数据排序（最热门的在前）
     result.sort(key=lambda x: x['data'][-1] if x['data'] else 0, reverse=True)
     
     return {
         "positions": result,
-        "dates": dates
+        "dates": all_dates
     }
 
 
@@ -584,45 +596,48 @@ async def get_trend(
     city: Optional[str] = None
 ):
     """获取报名趋势数据"""
-    daily_files = sorted(os.listdir(DAILY_DIR)) if os.path.exists(DAILY_DIR) else []
+    conn = get_db_connection()
     
-    if not daily_files:
-        return {"data": [], "message": "暂无报名数据"}
-    
-    trend_data = []
-    pos_df = None
-    
-    # 加载职位表用于地区筛选
-    if city and os.path.exists(POSITION_FILE):
-        pos_df = pd.read_excel(POSITION_FILE)
-        if '城市' not in pos_df.columns and '招录机关' in pos_df.columns:
-            pos_df['城市'] = pos_df['招录机关'].apply(extract_city_from_org)
-    
-    for f in daily_files:
-        file_date = f.replace('.xlsx', '')
-        daily_df = pd.read_excel(os.path.join(DAILY_DIR, f))
+    if position_code:
+        # Single position trend
+        query = """
+        SELECT date, applicants, passed
+        FROM applications
+        WHERE code = ?
+        ORDER BY date
+        """
+        df = pd.read_sql_query(query, conn, params=[str(position_code)])
         
-        # 地区筛选
-        if city and pos_df is not None:
-            city_positions = pos_df[pos_df['城市'].str.contains(city, na=False)]['职位代码'].astype(str).tolist()
-            daily_df['职位代码'] = daily_df['职位代码'].astype(str)
-            daily_df = daily_df[daily_df['职位代码'].isin(city_positions)]
+    elif city:
+        # City trend (sum of all positions in city)
+        # Verify join efficiency; if slow, might need optimization, but dataset is small (~5k positions)
+        query = """
+        SELECT a.date, 
+               SUM(a.applicants) as applicants, 
+               SUM(a.passed) as passed
+        FROM applications a
+        JOIN positions p ON a.code = p.code
+        WHERE p.city LIKE ?
+        GROUP BY a.date
+        ORDER BY a.date
+        """
+        df = pd.read_sql_query(query, conn, params=[f"%{city}%"])
         
-        # 按职位代码筛选
-        if position_code:
-            daily_df['职位代码'] = daily_df['职位代码'].astype(str)
-            daily_df = daily_df[daily_df['职位代码'] == str(position_code)]
+    else:
+        # Global trend
+        query = """
+        SELECT date, 
+               SUM(applicants) as applicants, 
+               SUM(passed) as passed
+        FROM applications
+        GROUP BY date
+        ORDER BY date
+        """
+        df = pd.read_sql_query(query, conn)
         
-        applicants = int(daily_df['报名人数'].sum()) if '报名人数' in daily_df.columns else 0
-        passed = int(daily_df['审核通过人数'].sum()) if '审核通过人数' in daily_df.columns else 0
-        
-        trend_data.append({
-            "date": file_date,
-            "applicants": applicants,
-            "passed": passed
-        })
+    conn.close()
     
-    return {"data": trend_data}
+    return {"data": df.fillna(0).to_dict(orient='records')}
 
 
 @app.get("/stats/hot-positions")

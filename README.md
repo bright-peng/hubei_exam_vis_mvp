@@ -13,6 +13,7 @@
 
 ### 后端
 - **FastAPI**: 高性能 Python Web 框架
+- **SQLite**: 轻量级关系型数据库
 - **Pandas**: 数据处理和分析
 - **OpenPyXL**: Excel 文件读写
 
@@ -62,10 +63,11 @@ npm run dev
 hubei_exam_vis_mvp/
 ├── backend/
 │   ├── main.py          # FastAPI 主程序
+│   ├── database.py      # 数据库操作接口
+│   ├── migrate.py       # Excel 到 SQLite 迁移脚本
 │   ├── requirements.txt # Python 依赖
 │   └── data/            # 数据存储目录
-│       ├── positions.xlsx    # 职位表
-│       └── daily/            # 每日报名数据
+│       └── exam.db      # SQLite 数据库文件 (由程序自动生成)
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx          # 主应用组件
@@ -146,5 +148,22 @@ hubei_exam_vis_mvp/
 - 响应式布局
 
 ---
+
+## 🌐 部署与预览
+
+由于本项目包含 Python 后端和 SQLite 数据库，直接使用 GitHub Pages 只能展示静态前端界面，无法运行 API。
+
+### 推荐部署方案
+
+1. **Render.com (推荐)**
+   - 可以同时托管前端 (Static Site) 和后端 (Web Service)。
+   - 后端需要配置 `DASHBOARD_URL` 环境变量。
+
+2. **Vercel (前端) + Railway (后端)**
+   - Vercel 托管 React 前端。
+   - Railway 托管 FastAPI 后端和数据库。
+
+3. **本地演示**
+   - 按照「快速开始」步骤即可在本地完整运行。
 
 ⚠️ **免责声明**: 本工具仅供个人参考使用，数据准确性以官方发布为准。

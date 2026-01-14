@@ -110,10 +110,18 @@ def export_positions():
     print("Exporting positions...")
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT MAX(date) FROM applications")
-    latest_date = cursor.fetchone()[0]
     
-    # Fetch all positions with latest stats
+    # Get all available dates
+    cursor.execute("SELECT DISTINCT date FROM applications ORDER BY date")
+    dates = [r[0] for r in cursor.fetchall()]
+    
+    if not dates:
+        print("No application dates found!")
+        conn.close()
+        return
+    
+    latest_date = dates[-1]
+    
     # We rename columns here to match what frontend expects locally or mapped in python
     query = """
     SELECT p.code as "职位代码", 
@@ -122,7 +130,7 @@ def export_positions():
            p.unit as "用人单位", 
            p.quota as "招录人数", 
            p.city as "城市", 
-           p.district as "district", -- Keep internal for filtering if needed, or map to user friendly
+           p.district as "district",
            p.education as "学历", 
            p.degree as "学位", 
            p.major_pg as "研究生专业", 
@@ -135,18 +143,25 @@ def export_positions():
     FROM positions p
     LEFT JOIN applications a ON p.code = a.code AND a.date = ?
     """
+    
+    # Export for each date
+    for target_date in dates:
+        df = pd.read_sql_query(query, conn, params=(target_date,))
+        df['竞争比'] = df.apply(lambda row: round(row['报名人数'] / max(row['招录人数'], 1), 1), axis=1)
+        data = df.fillna("").to_dict(orient='records')
+        
+        # Save per-date file
+        filename = f"positions_{target_date}.json"
+        with open(os.path.join(OUTPUT_DIR, filename), 'w', encoding='utf-8') as f:
+            json.dump({"data": data, "date": target_date, "total": len(data)}, f, ensure_ascii=False)
+        print(f"  - Exported {filename}")
+    
+    # Also save the latest as 'positions.json' for default/backwards compat
     df = pd.read_sql_query(query, conn, params=(latest_date,))
-    
-    # Calculate competition ratio
-    # Avoid division by zero
     df['竞争比'] = df.apply(lambda row: round(row['报名人数'] / max(row['招录人数'], 1), 1), axis=1)
-    
-    # Convert to list of dicts
     data = df.fillna("").to_dict(orient='records')
-    
-    # Save full data
     with open(os.path.join(OUTPUT_DIR, "positions.json"), 'w', encoding='utf-8') as f:
-        json.dump({"data": data, "date": latest_date, "total": len(data)}, f, ensure_ascii=False) # remove indent to save space
+        json.dump({"data": data, "date": latest_date, "total": len(data)}, f, ensure_ascii=False)
 
     conn.close()
 

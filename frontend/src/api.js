@@ -23,17 +23,29 @@ api.interceptors.response.use(
 export default api
 
 // --- 静态模式辅助函数 ---
-let positionsCache = null
+let positionsCache = {}  // Changed to object to cache by date
 let trendCache = null
-const loadStaticPositions = async () => {
-    if (positionsCache) return positionsCache
+
+const loadStaticPositions = async (date = null) => {
+    // If no date specified, use '' as key for default/latest
+    const cacheKey = date || ''
+    if (positionsCache[cacheKey]) return positionsCache[cacheKey]
+
     try {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/positions.json')
-        positionsCache = res.data.data
-        return positionsCache
+        // Load date-specific file if date provided, else load default
+        const filename = date ? `positions_${date}.json` : 'positions.json'
+        const res = await axios.get(import.meta.env.BASE_URL + 'data/' + filename)
+        positionsCache[cacheKey] = res.data.data
+        return positionsCache[cacheKey]
     } catch (e) {
         console.error("Failed to load static positions", e)
-        return []
+        // Fallback to default if date-specific file doesn't exist
+        if (date && !positionsCache['']) {
+            const res = await axios.get(import.meta.env.BASE_URL + 'data/positions.json')
+            positionsCache[''] = res.data.data
+            return positionsCache['']
+        }
+        return positionsCache[''] || []
     }
 }
 
@@ -103,7 +115,7 @@ export const uploadDaily = (file, date) => {
 
 export const getPositions = async (params) => {
     if (USE_STATIC_DATA) {
-        const all = await loadStaticPositions()
+        const all = await loadStaticPositions(params.date)
         const filtered = filterPositions(all, params)
 
         // 排序：默认按报名人数降序
@@ -121,7 +133,7 @@ export const getPositions = async (params) => {
             total: filtered.length,
             page: page,
             page_size: pageSize,
-            date: "静态数据"
+            date: params.date || "最新数据"
         }
     }
     return api.get('/positions', { params })
@@ -150,22 +162,22 @@ export const getTrend = async (params) => {
     return api.get('/stats/trend', { params })
 }
 
-export const getHotPositions = async (limit = 20) => {
+export const getHotPositions = async (limit = 20, date = null) => {
     if (USE_STATIC_DATA) {
-        const all = await loadStaticPositions()
+        const all = await loadStaticPositions(date)
         // 按报名人数降序
         const sorted = [...all].sort((a, b) => (b['报名人数'] || 0) - (a['报名人数'] || 0))
         return {
             data: sorted.slice(0, limit),
-            date: "静态数据"
+            date: date || "最新数据"
         }
     }
-    return api.get('/stats/hot-positions', { params: { limit } })
+    return api.get('/stats/hot-positions', { params: { limit, date } })
 }
 
-export const getColdPositions = async (limit = 20) => {
+export const getColdPositions = async (limit = 20, date = null) => {
     if (USE_STATIC_DATA) {
-        const all = await loadStaticPositions()
+        const all = await loadStaticPositions(date)
         // 按报名人数升序，然后招录人数降序
         const sorted = [...all].sort((a, b) => {
             const diff = (a['报名人数'] || 0) - (b['报名人数'] || 0)
@@ -174,10 +186,10 @@ export const getColdPositions = async (limit = 20) => {
         })
         return {
             data: sorted.slice(0, limit),
-            date: "静态数据"
+            date: date || "最新数据"
         }
     }
-    return api.get('/stats/cold-positions', { params: { limit } })
+    return api.get('/stats/cold-positions', { params: { limit, date } })
 }
 
 export const getSummary = async (date) => {

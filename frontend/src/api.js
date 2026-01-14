@@ -138,8 +138,11 @@ export const getStatsByRegion = async (date) => {
 
 export const getTrend = async (params) => {
     if (USE_STATIC_DATA) {
-        // 静态模式暂不支持按城市/职位筛选趋势，返回全局趋势
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/trend.json')
+        let url = 'data/trend.json'
+        if (params && params.city) {
+            url = `data/trend_${params.city}.json`
+        }
+        const res = await axios.get(import.meta.env.BASE_URL + url)
         return { data: res.data.data }
     }
     return api.get('/stats/trend', { params })

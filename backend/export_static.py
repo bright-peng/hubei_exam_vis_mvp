@@ -61,6 +61,7 @@ def export_trend():
     print("Exporting trend...")
     conn = get_db_connection()
     
+    # 1. Global Trend
     query = """
     SELECT date, 
            SUM(applicants) as applicants, 
@@ -74,6 +75,34 @@ def export_trend():
     
     with open(os.path.join(OUTPUT_DIR, "trend.json"), 'w', encoding='utf-8') as f:
         json.dump({"data": trend_data}, f, ensure_ascii=False, indent=2)
+
+    # 2. City-specific Trends
+    # Get all cities first
+    city_cursor = conn.cursor()
+    city_cursor.execute("SELECT DISTINCT city FROM positions WHERE city IS NOT NULL AND city != ''")
+    cities = [r[0] for r in city_cursor.fetchall()]
+    
+    for city in cities:
+        # Query for specific city
+        # Join positions to filter by city, then group by date
+        city_query = """
+        SELECT a.date, 
+               SUM(a.applicants) as applicants, 
+               SUM(a.passed) as passed
+        FROM applications a
+        JOIN positions p ON a.code = p.code
+        WHERE p.city = ?
+        GROUP BY a.date
+        ORDER BY a.date
+        """
+        df_city = pd.read_sql_query(city_query, conn, params=(city,))
+        city_trend_data = df_city.to_dict(orient='records')
+        
+        # Save to file, e.g., trend_武汉市.json
+        # Check for filename safety if needed, but Chinese usually works on modern OS/web servers
+        filename = f"trend_{city}.json"
+        with open(os.path.join(OUTPUT_DIR, filename), 'w', encoding='utf-8') as f:
+            json.dump({"data": city_trend_data}, f, ensure_ascii=False, indent=2)
 
     conn.close()
 

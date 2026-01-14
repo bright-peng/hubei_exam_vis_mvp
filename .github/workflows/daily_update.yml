@@ -6,6 +6,9 @@ on:
     - cron: '0 10 * * *'
     # 每天北京时间 22:00 (UTC 14:00) 运行
     - cron: '0 14 * * *'
+  push:
+    branches:
+      - main
   workflow_dispatch: # 允许手动触发
 
 jobs:

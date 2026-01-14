@@ -1,0 +1,72 @@
+name: Daily Data Update
+
+on:
+  schedule:
+    # 每天北京时间 18:00 (UTC 10:00) 运行
+    - cron: '0 10 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 pandas openpyxl schedule
+
+    - name: Run Crawler & Export
+      env:
+        PYTHONPATH: ${{ github.workspace }}/backend
+      run: |
+        cd backend
+        python crawler.py
+
+    - name: Check for changes
+      id: git-check
+      run: |
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
+        git add backend/data/exam.db backend/data/daily/ frontend/public/data/
+        git status
+        # 检查是否有文件变化
+        if [[ -n $(git status -s) ]]; then
+          echo "changes=true" >> $GITHUB_OUTPUT
+          git commit -m "Auto update daily stats via GitHub Actions"
+          git push
+        else
+          echo "changes=false" >> $GITHUB_OUTPUT
+          echo "No new data found."
+        fi
+
+    - name: Set up Node.js
+      if: steps.git-check.outputs.changes == 'true'
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install and Build Frontend
+      if: steps.git-check.outputs.changes == 'true'
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    - name: Deploy to GitHub Pages
+      if: steps.git-check.outputs.changes == 'true'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./frontend/dist
+        force_orphan: true

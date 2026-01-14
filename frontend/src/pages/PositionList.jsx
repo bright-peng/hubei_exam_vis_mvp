@@ -195,8 +195,8 @@ export default function PositionList() {
                     return (
                       <tr key={pos.职位代码}>
                         <td className="code">{pos.职位代码}</td>
-                        <td className="org">{pos.用人单位}</td>
-                        <td className="name">{pos.职位名称}</td>
+                        <td className="org" title={pos.用人单位}>{pos.用人单位}</td>
+                        <td className="name" title={pos.职位名称}>{pos.职位名称}</td>
                         <td className="center">{pos.招录人数}</td>
                         <td className="center">
                           <span className={isHot ? 'hot-value' : isCold ? 'cold-value' : ''}>
@@ -210,7 +210,7 @@ export default function PositionList() {
                         </td>
                         <td className="major" title={pos.研究生专业}>{pos.研究生专业 || '不限'}</td>
                         <td className="major" title={pos.本科专业}>{pos.本科专业 || '不限'}</td>
-                        <td className="tags">{pos.招录对象 || '不限'}</td>
+                        <td className="tags" title={pos.招录对象}>{pos.招录对象 || '不限'}</td>
                         <td className="actions">
                           <button className="btn-detail" onClick={() => handleShowDetail(pos)}>
                             详情

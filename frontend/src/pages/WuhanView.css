@@ -422,3 +422,38 @@
     flex-wrap: wrap;
   }
 }
+
+/* 飙升榜样式 */
+.surge-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.surge-value {
+  color: #d946ef !important;
+  font-weight: 700 !important;
+}
+
+.rank-cell {
+  width: 50px;
+  text-align: center;
+}
+
+.rank-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.rank-badge.top {
+  background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(217, 70, 239, 0.3);
+}

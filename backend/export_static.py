@@ -229,6 +229,83 @@ def export_maps():
         
     conn.close()
 
+def export_surge():
+    """Export top surge positions (biggest daily increase)"""
+    print("Exporting surge data...")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get latest two dates
+    cursor.execute("SELECT DISTINCT date FROM applications ORDER BY date DESC LIMIT 2")
+    dates = [r[0] for r in cursor.fetchall()]
+    
+    if len(dates) < 2:
+        print("Not enough dates for surge calculation, skipping...")
+        # Still create empty file
+        with open(os.path.join(OUTPUT_DIR, "surge.json"), 'w', encoding='utf-8') as f:
+            json.dump({"data": [], "date": dates[0] if dates else None, "prev_date": None}, f, ensure_ascii=False)
+        conn.close()
+        return
+    
+    latest_date = dates[0]
+    prev_date = dates[1]
+    
+    # Query to get delta between two dates
+    query = """
+    SELECT p.code as code,
+           p.name as name,
+           p.unit as unit,
+           p.city as city,
+           p.quota as quota,
+           COALESCE(a_today.applicants, 0) as applicants_today,
+           COALESCE(a_prev.applicants, 0) as applicants_prev,
+           COALESCE(a_today.applicants, 0) - COALESCE(a_prev.applicants, 0) as delta
+    FROM positions p
+    LEFT JOIN applications a_today ON p.code = a_today.code AND a_today.date = ?
+    LEFT JOIN applications a_prev ON p.code = a_prev.code AND a_prev.date = ?
+    ORDER BY delta DESC
+    LIMIT 30
+    """
+    df = pd.read_sql_query(query, conn, params=(latest_date, prev_date))
+    
+    # Filter only positive deltas (actual surges)
+    df = df[df['delta'] > 0]
+    
+    surge_data = df.to_dict(orient='records')
+    
+    # Also calculate for Wuhan specifically
+    query_wuhan = """
+    SELECT p.code as code,
+           p.name as name,
+           p.unit as unit,
+           p.district as district,
+           p.quota as quota,
+           COALESCE(a_today.applicants, 0) as applicants_today,
+           COALESCE(a_prev.applicants, 0) as applicants_prev,
+           COALESCE(a_today.applicants, 0) - COALESCE(a_prev.applicants, 0) as delta
+    FROM positions p
+    LEFT JOIN applications a_today ON p.code = a_today.code AND a_today.date = ?
+    LEFT JOIN applications a_prev ON p.code = a_prev.code AND a_prev.date = ?
+    WHERE p.city = '武汉市'
+    ORDER BY delta DESC
+    LIMIT 20
+    """
+    df_wuhan = pd.read_sql_query(query_wuhan, conn, params=(latest_date, prev_date))
+    df_wuhan = df_wuhan[df_wuhan['delta'] > 0]
+    surge_wuhan = df_wuhan.to_dict(orient='records')
+    
+    result = {
+        "data": surge_data,
+        "wuhan": surge_wuhan,
+        "date": latest_date,
+        "prev_date": prev_date
+    }
+    
+    with open(os.path.join(OUTPUT_DIR, "surge.json"), 'w', encoding='utf-8') as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+    
+    conn.close()
+
 def export_all():
     """Execute all export functions"""
     try:
@@ -238,6 +315,7 @@ def export_all():
         export_positions()
         export_filters()
         export_maps()
+        export_surge()
         print("Static data export completed!")
         return True
     except Exception as e:

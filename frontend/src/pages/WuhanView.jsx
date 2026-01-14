@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getWuhanDistricts, getWuhanPositions } from '../api';
+import { getWuhanDistricts, getWuhanPositions, getSurgePositions } from '../api';
 import DateSelector from '../components/DateSelector';
 import './WuhanView.css';
 
@@ -28,6 +28,7 @@ const WUHAN_DISTRICTS = [
 function WuhanView() {
   const [districtData, setDistrictData] = useState([]);
   const [positions, setPositions] = useState([]);
+  const [wuhanSurge, setWuhanSurge] = useState([]);
   const [summary, setSummary] = useState({});
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
@@ -48,7 +49,17 @@ function WuhanView() {
   const fetchDistrictStats = async () => {
     setLoading(true);
     try {
-      const data = await getWuhanDistricts(selectedDate);
+      const promises = [getWuhanDistricts(selectedDate)];
+      
+      // Get surge data if latest date
+      if (!selectedDate) {
+        promises.push(getSurgePositions());
+      }
+      
+      const results = await Promise.all(promises);
+      const data = results[0];
+      const surgeData = !selectedDate ? results[1] : { wuhan: [] };
+
       setDistrictData(data.data || []);
       setSummary({
         totalPositions: data.total_positions,
@@ -56,6 +67,7 @@ function WuhanView() {
         totalApplicants: data.total_applicants,
         date: data.date
       });
+      setWuhanSurge(surgeData.wuhan || []);
     } catch (err) {
       console.error('获取武汉区县数据失败:', err);
     } finally {
@@ -288,6 +300,45 @@ function WuhanView() {
           </div>
         </div>
       </div>
+
+      {/* 武汉报名飙升榜 */}
+      {!selectedDate && wuhanSurge.length > 0 && (
+        <div className="district-detail surge-section">
+          <div className="detail-header">
+            <h3>🚀 今日报名飙升 Top 20 (全武汉)</h3>
+          </div>
+          <div className="positions-table-wrapper">
+            <table className="positions-table">
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>职位代码</th>
+                  <th>职位名称</th>
+                  <th>用人单位</th>
+                  <th>所在区</th>
+                  <th>报名总数</th>
+                  <th>今日新增</th>
+                </tr>
+              </thead>
+              <tbody>
+                {wuhanSurge.map((pos, index) => (
+                  <tr key={pos.code || index}>
+                    <td className="rank-cell">
+                      <span className={`rank-badge ${index < 3 ? 'top' : ''}`}>{index + 1}</span>
+                    </td>
+                    <td className="code">{pos.code}</td>
+                    <td>{pos.name}</td>
+                    <td>{pos.unit}</td>
+                    <td>{pos.district}</td>
+                    <td className="num">{pos.applicants_today?.toLocaleString()}</td>
+                    <td className="surge-value">+{pos.delta?.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* 选中区域的职位详情 */}
       {selectedDistrict && (

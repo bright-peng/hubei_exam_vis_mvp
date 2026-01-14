@@ -41,7 +41,7 @@
 /* 职位列表网格 */
 .positions-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: var(--spacing-lg);
 }
 
@@ -86,6 +86,11 @@
   color: white;
 }
 
+.position-rank.surge {
+  background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%);
+  color: white;
+}
+
 .position-info {
   flex: 1;
   min-width: 0;
@@ -110,12 +115,19 @@
 .position-stats {
   text-align: right;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .applicants {
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary-light);
+}
+
+.surge-text {
+  color: #d946ef;
 }
 
 .competition {

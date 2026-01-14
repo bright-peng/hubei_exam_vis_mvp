@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import * as echarts from 'echarts'
-import { getSummary, getHotPositions, getColdPositions, getTrend } from '../api'
+import { getSummary, getHotPositions, getColdPositions, getTrend, getSurgePositions } from '../api'
 import DateSelector from '../components/DateSelector'
 import './Dashboard.css'
 
@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [summary, setSummary] = useState(null)
   const [hotPositions, setHotPositions] = useState([])
   const [coldPositions, setColdPositions] = useState([])
+  const [surgePositions, setSurgePositions] = useState([])
   const [selectedDate, setSelectedDate] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -18,14 +19,28 @@ export default function Dashboard() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [summaryData, hotData, coldData] = await Promise.all([
+      const promises = [
         getSummary(selectedDate),
         getHotPositions(10, selectedDate),
         getColdPositions(10, selectedDate),
-      ])
+      ]
+      
+      // Only fetch surge data if looking at latest date (empty selectedDate)
+      // or if we want to show it anyway (it's static latest surge)
+      if (!selectedDate) {
+        promises.push(getSurgePositions())
+      }
+
+      const results = await Promise.all(promises)
+      const summaryData = results[0]
+      const hotData = results[1]
+      const coldData = results[2]
+      const surgeData = !selectedDate ? results[3] : { data: [] }
+
       setSummary(summaryData)
       setHotPositions(hotData.data || [])
       setColdPositions(coldData.data || [])
+      setSurgePositions(surgeData.data?.slice(0, 10) || []) // Top 10
     } catch (error) {
       console.error('加载数据失败:', error)
     } finally {
@@ -171,6 +186,39 @@ export default function Dashboard() {
 
       {/* 热门/冷门岗位 */}
       <div className="positions-grid">
+        {/* 只有在没有选择日期（即看最新）时才显示激增榜 */}
+        {!selectedDate && (
+          <div className="glass-card">
+            <h3 className="section-title">
+              <span className="surge-icon">🚀</span>
+              报名激增 Top 10
+            </h3>
+            <div className="position-list">
+              {surgePositions.length === 0 ? (
+                <div className="empty-list">暂无数据</div>
+              ) : (
+                surgePositions.map((pos, idx) => (
+                  <div key={pos.code || idx} className="position-item">
+                    <div className="position-rank surge">{idx + 1}</div>
+                    <div className="position-info">
+                      <div className="position-name">{pos.name || pos.unit}</div>
+                      <div className="position-meta">
+                        {pos.unit || ''} · {pos.city || ''}
+                      </div>
+                    </div>
+                    <div className="position-stats">
+                      <div className="applicants surge-text">+{pos.delta?.toLocaleString() || 0}</div>
+                      <div className="competition">
+                        总{pos.applicants_today?.toLocaleString() || 0}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="glass-card">
           <h3 className="section-title">
             <span className="hot-icon">🔥</span>

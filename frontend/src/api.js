@@ -233,3 +233,15 @@ export const getWuhanPositions = async (params) => {
     }
     return api.get('/positions/wuhan', { params })
 }
+
+export const getSurgePositions = async () => {
+    // In both static and dynamic modes (if crawler ran locally), we rely on the generated JSON file
+    // because calculating surge requires heavy SQL comparisons which we put in export_static.py
+    try {
+        const res = await axios.get(import.meta.env.BASE_URL + 'data/surge.json')
+        return res.data
+    } catch (e) {
+        console.warn("Surge data not found (maybe crawler hasn't run yet)", e)
+        return { data: [], wuhan: [] }
+    }
+}

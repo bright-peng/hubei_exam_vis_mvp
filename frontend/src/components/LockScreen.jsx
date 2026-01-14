@@ -3,7 +3,8 @@ import './LockScreen.css';
 
 // 简单的密码配置（注意：这是前端硬编码，不够安全，仅防普通用户）
 // 也可以配置为环境变量 import.meta.env.VITE_APP_PASSWORD
-const CORRECT_PASSWORD = '888'; 
+// 简单的密码配置（注意：这是前端硬编码，不够安全，仅防普通用户）
+const VALID_PASSWORDS = ['whu', '888', '666']; 
 
 export default function LockScreen({ onUnlock }) {
   const [password, setPassword] = useState('');
@@ -11,7 +12,7 @@ export default function LockScreen({ onUnlock }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password === CORRECT_PASSWORD) {
+    if (VALID_PASSWORDS.includes(password)) {
       onUnlock();
     } else {
       setError(true);

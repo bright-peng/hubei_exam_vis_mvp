@@ -73,7 +73,8 @@ const filterPositions = (data, params) => {
             (p['专业'] && p['专业'].includes(k)) || // Back compat
             (p['本科专业'] && p['本科专业'].includes(k)) ||
             (p['研究生专业'] && p['研究生专业'].includes(k)) ||
-            (p['职位简介'] && p['职位简介'].includes(k))
+            (p['职位简介'] && p['职位简介'].includes(k)) ||
+            (p['备注'] && p['备注'].includes(k))
         )
     }
     return result

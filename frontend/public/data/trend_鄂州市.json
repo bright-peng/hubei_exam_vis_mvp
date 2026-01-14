@@ -4,6 +4,11 @@
       "date": "2026-01-13",
       "applicants": 222,
       "passed": 0
+    },
+    {
+      "date": "2026-01-14",
+      "applicants": 555,
+      "passed": 0
     }
   ]
 }

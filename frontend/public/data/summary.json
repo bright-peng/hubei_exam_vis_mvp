@@ -1,10 +1,11 @@
 {
   "total_positions": 5224,
   "total_quota": 8027,
-  "total_applicants": 18458,
+  "total_applicants": 42428,
   "total_passed": 0,
-  "date": "2026-01-13",
+  "date": "2026-01-14",
   "daily_files": [
-    "2026-01-13"
+    "2026-01-13",
+    "2026-01-14"
   ]
 }

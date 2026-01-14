@@ -116,7 +116,7 @@ export default function Dashboard() {
     )
   }
 
-  if (!summary?.has_positions) {
+  if (!summary?.total_positions) {
     return (
       <div className="dashboard">
         <div className="empty-state glass-card">

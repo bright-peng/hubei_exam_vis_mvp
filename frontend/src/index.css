@@ -317,11 +317,13 @@ body::before {
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
+  color: #fff; /* Fallback */
   background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .stat-label {

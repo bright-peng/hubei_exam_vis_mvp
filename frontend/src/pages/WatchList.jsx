@@ -275,8 +275,8 @@ function WatchList() {
                     <tr key={pos.职位代码}>
                       <td className="col-index">{index + 1}</td>
                       <td className="col-code">{pos.职位代码}</td>
-                      <td className="col-name">{pos.职位名称}</td>
-                      <td className="col-unit">{pos.用人单位}</td>
+                      <td className="col-name" title={pos.职位名称}>{pos.职位名称}</td>
+                      <td className="col-unit" title={pos.用人单位}>{pos.用人单位}</td>
                       <td className="col-quota">{pos.招录人数}</td>
                       <td className="col-applicants highlight">{pos.报名人数?.toLocaleString()}</td>
                       <td className="col-ratio">

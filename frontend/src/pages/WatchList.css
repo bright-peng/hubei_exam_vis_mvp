@@ -398,24 +398,70 @@
   white-space: nowrap;
 }
 
-.col-org, .col-unit {
+.col-org,
+.col-unit {
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.col-city, .col-district {
+.col-city,
+.col-district {
   white-space: nowrap;
 }
 
-.col-quota, .col-applicants {
+.col-quota,
+.col-applicants {
   text-align: center;
   font-weight: 600;
 }
 
 .col-applicants.highlight {
   color: #60a5fa !important;
+}
+
+/* 截断单元格的 Tooltip（WatchList 专用）*/
+.positions-table .col-name,
+.positions-table .col-unit,
+.positions-table .col-major {
+  position: relative;
+  cursor: pointer;
+}
+
+.positions-table .col-name:hover::after,
+.positions-table .col-unit:hover::after,
+.positions-table .col-major:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.98);
+  color: #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  max-width: 350px;
+  white-space: normal;
+  word-wrap: break-word;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  pointer-events: none;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .col-ratio {
@@ -505,7 +551,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading p {
@@ -580,7 +628,7 @@
   .add-form {
     flex-direction: column;
   }
-  
+
   .form-actions {
     flex-direction: row;
   }
@@ -592,16 +640,16 @@
     gap: 16px;
     text-align: center;
   }
-  
+
   .header-stats {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .panel-header {
     flex-wrap: wrap;
   }
-  
+
   .sort-controls {
     width: 100%;
     margin-top: 8px;

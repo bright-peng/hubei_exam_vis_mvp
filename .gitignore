@@ -19,6 +19,7 @@ backend/*.pyc
 *.xls
 data/*.db
 data/*.xlsx
+!backend/data/daily/*.xlsx
 # If you want to keep the data directory structure but ignore files:
 # !data/.gitkeep
 

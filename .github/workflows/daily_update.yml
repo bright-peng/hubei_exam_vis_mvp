@@ -2,6 +2,8 @@ name: Daily Data Update
 
 on:
   schedule:
+    # 每天北京时间 06:00 (UTC 22:00) 运行
+    - cron: '0 22 * * *'
     # 每天北京时间 18:00 (UTC 10:00) 运行
     - cron: '0 10 * * *'
     # 每天北京时间 22:00 (UTC 14:00) 运行

@@ -32,7 +32,7 @@ export const getDailyMomentum = async (todayDate, yesterdayDate) => {
             if (!yesterdayDate) {
                 // Try to get available dates from summary.json
                 try {
-                    const summaryRes = await axios.get(import.meta.env.BASE_URL + 'data/summary.json');
+                    const summaryRes = await axios.get(`${import.meta.env.BASE_URL}data/summary.json?t=${new Date().getTime()}`);
                     const dailyFiles = summaryRes.data?.daily_files || [];
                     if (dailyFiles.length >= 2) {
                         // daily_files is usually [oldest, ..., latest], so reverse for [latest, ..., oldest]
@@ -58,6 +58,10 @@ export const getDailyMomentum = async (todayDate, yesterdayDate) => {
 
             todayUrl = import.meta.env.BASE_URL + (todayDate ? `data/positions_${todayDate}.json` : 'data/positions.json');
             yesterdayUrl = import.meta.env.BASE_URL + `data/positions_${actualYesterday}.json`;
+
+            // Add cache buster
+            todayUrl += `?t=${new Date().getTime()}`;
+            yesterdayUrl += `?t=${new Date().getTime()}`;
 
             const [todayRes, yesterdayRes] = await Promise.all([
                 axios.get(todayUrl),

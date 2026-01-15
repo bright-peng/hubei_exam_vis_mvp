@@ -38,7 +38,7 @@ export const loadStaticPositions = (date = null) => {
         try {
             // Load date-specific file if date provided, else load default
             const filename = date ? `positions_${date}.json` : 'positions.json'
-            const res = await axios.get(import.meta.env.BASE_URL + 'data/' + filename)
+            const res = await axios.get(`${import.meta.env.BASE_URL}data/${filename}?t=${new Date().getTime()}`)
             return res.data.data
         } catch (e) {
             console.error("Failed to load static positions", e)
@@ -48,7 +48,7 @@ export const loadStaticPositions = (date = null) => {
                 if (!positionsPromiseCache['']) {
                     // Initiate default load if not available
                     positionsPromiseCache[''] = (async () => {
-                        const res = await axios.get(import.meta.env.BASE_URL + 'data/positions.json')
+                        const res = await axios.get(`${import.meta.env.BASE_URL}data/positions.json?t=${new Date().getTime()}`)
                         return res.data.data
                     })()
                 }
@@ -67,7 +67,7 @@ const loadStaticTrends = () => {
 
     trendPromise = (async () => {
         try {
-            const res = await axios.get(import.meta.env.BASE_URL + 'data/trends_granular.json')
+            const res = await axios.get(`${import.meta.env.BASE_URL}data/trends_granular.json?t=${new Date().getTime()}`)
             return res.data
         } catch (e) {
             console.error("Failed to load static trends", e)
@@ -262,7 +262,7 @@ export const getTrend = async (params) => {
         if (params && params.city) {
             url = `data/trend_${params.city}.json`
         }
-        const res = await axios.get(import.meta.env.BASE_URL + url)
+        const res = await axios.get(`${import.meta.env.BASE_URL}${url}?t=${new Date().getTime()}`)
         return { data: res.data.data }
     }
     return api.get('/stats/trend', { params })
@@ -301,7 +301,7 @@ export const getColdPositions = async (limit = 20, date = null) => {
 export const getSummary = async (date) => {
     if (USE_STATIC_DATA) {
         // Always load base summary for daily_files list
-        const summaryRes = await axios.get(import.meta.env.BASE_URL + 'data/summary.json')
+        const summaryRes = await axios.get(`${import.meta.env.BASE_URL}data/summary.json?t=${new Date().getTime()}`)
         const baseSummary = summaryRes.data
 
         // If a specific date is requested, compute stats from that date's position data
@@ -327,7 +327,7 @@ export const getSummary = async (date) => {
 
 export const getFilters = async () => {
     if (USE_STATIC_DATA) {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/filters.json')
+        const res = await axios.get(`${import.meta.env.BASE_URL}data/filters.json?t=${new Date().getTime()}`)
         return res.data
     }
     return api.get('/filters')
@@ -335,7 +335,7 @@ export const getFilters = async () => {
 
 export const getAvailableDates = async () => {
     if (USE_STATIC_DATA) {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/summary.json')
+        const res = await axios.get(`${import.meta.env.BASE_URL}data/summary.json?t=${new Date().getTime()}`)
         return res.data.daily_files || []
     }
     return api.get('/stats/dates')
@@ -393,7 +393,7 @@ export const getSurgePositions = async () => {
     // In both static and dynamic modes (if crawler ran locally), we rely on the generated JSON file
     // because calculating surge requires heavy SQL comparisons which we put in export_static.py
     try {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/surge.json')
+        const res = await axios.get(`${import.meta.env.BASE_URL}data/surge.json?t=${new Date().getTime()}`)
         return res.data
     } catch (e) {
         console.warn("Surge data not found (maybe crawler hasn't run yet)", e)

@@ -185,11 +185,15 @@ def export_filters():
     
     cursor.execute("SELECT DISTINCT degree FROM positions WHERE degree IS NOT NULL AND degree != '' ORDER BY degree")
     degree = [r[0] for r in cursor.fetchall()]
+
+    cursor.execute("SELECT DISTINCT target FROM positions WHERE target IS NOT NULL AND target != '' ORDER BY target")
+    targets = [r[0] for r in cursor.fetchall()]
     
     filters = {
         "cities": cities,
         "education": education,
-        "degree": degree
+        "degree": degree,
+        "targets": targets
     }
     
     with open(os.path.join(OUTPUT_DIR, "filters.json"), 'w', encoding='utf-8') as f:

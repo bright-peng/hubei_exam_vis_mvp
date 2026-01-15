@@ -22,7 +22,7 @@
 
 .filter-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr auto;
+  grid-template-columns: repeat(3, 1fr) 1.5fr auto;
   gap: var(--spacing-md);
   align-items: end;
 }
@@ -41,6 +41,14 @@
 .filter-actions {
   display: flex;
   gap: var(--spacing-sm);
+}
+
+/* 强制对齐输入框和按钮高度 */
+.filter-grid .select,
+.filter-grid .input,
+.filter-actions .btn {
+  height: 42px;
+  line-height: normal; /* 防止行高影响 flex 居中 */
 }
 
 /* 结果信息 */
@@ -193,15 +201,15 @@
 /* 响应式 */
 @media (max-width: 1024px) {
   .filter-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
   }
-  
+
   .keyword-filter {
-    grid-column: span 2;
+    grid-column: span 3;
   }
-  
+
   .filter-actions {
-    grid-column: span 2;
+    grid-column: span 3;
     justify-content: flex-end;
   }
 }

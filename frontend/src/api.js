@@ -76,18 +76,26 @@ const filterPositions = (data, params) => {
     if (params.education) {
         result = result.filter(p => p['学历'] === params.education)
     }
+    if (params.target) {
+        result = result.filter(p => p['招录对象'] === params.target)
+    }
     if (params.keyword) {
         const k = params.keyword.toLowerCase()
         result = result.filter(p =>
-            (p['职位代码'] && String(p['职位代码']).includes(k)) ||
-            (p['职位名称'] && p['职位名称'].includes(k)) ||
-            (p['招录机关'] && p['招录机关'].includes(k)) ||
-            (p['用人单位'] && p['用人单位'].includes(k)) ||
-            (p['专业'] && p['专业'].includes(k)) || // Back compat
-            (p['本科专业'] && p['本科专业'].includes(k)) ||
-            (p['研究生专业'] && p['研究生专业'].includes(k)) ||
-            (p['职位简介'] && p['职位简介'].includes(k)) ||
-            (p['备注'] && p['备注'].includes(k))
+            (p['职位代码'] && String(p['职位代码']).toLowerCase().includes(k)) ||
+            (p['职位名称'] && String(p['职位名称']).toLowerCase().includes(k)) ||
+            (p['招录机关'] && String(p['招录机关']).toLowerCase().includes(k)) ||
+            (p['用人单位'] && String(p['用人单位']).toLowerCase().includes(k)) ||
+            (p['城市'] && String(p['城市']).toLowerCase().includes(k)) ||
+            (p['区县'] && String(p['区县']).toLowerCase().includes(k)) ||
+            (p['学历'] && String(p['学历']).toLowerCase().includes(k)) ||
+            (p['学位'] && String(p['学位']).toLowerCase().includes(k)) ||
+            (p['专业'] && String(p['专业']).toLowerCase().includes(k)) || // Back compat
+            (p['本科专业'] && String(p['本科专业']).toLowerCase().includes(k)) ||
+            (p['研究生专业'] && String(p['研究生专业']).toLowerCase().includes(k)) ||
+            (p['招录对象'] && String(p['招录对象']).toLowerCase().includes(k)) ||
+            (p['职位简介'] && String(p['职位简介']).toLowerCase().includes(k)) ||
+            (p['备注'] && String(p['备注']).toLowerCase().includes(k))
         )
     }
     return result

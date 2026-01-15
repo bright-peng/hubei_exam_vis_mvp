@@ -33,6 +33,7 @@ export default function PositionList() {
   // 筛选条件
   const [selectedCity, setSelectedCity] = useState('武汉市')
   const [selectedEducation, setSelectedEducation] = useState(undefined)
+  const [selectedTarget, setSelectedTarget] = useState(undefined)
   const [selectedDate, setSelectedDate] = useState('')
   const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
@@ -47,7 +48,7 @@ export default function PositionList() {
   useEffect(() => {
     loadPositions()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, selectedCity, selectedEducation, selectedDate])
+  }, [page, selectedCity, selectedEducation, selectedTarget, selectedDate])
 
   const loadFilters = async () => {
     try {
@@ -68,6 +69,7 @@ export default function PositionList() {
       }
       if (selectedCity) params.city = selectedCity
       if (selectedEducation) params.education = selectedEducation
+      if (selectedTarget) params.target = selectedTarget
       if (keyword) params.keyword = keyword
 
       const data = await getPositions(params)
@@ -89,6 +91,7 @@ export default function PositionList() {
     form.resetFields()
     setSelectedCity('武汉市')
     setSelectedEducation(undefined)
+    setSelectedTarget(undefined)
     setSelectedDate('')
     setKeyword('')
     setPage(1)
@@ -105,13 +108,21 @@ export default function PositionList() {
       title: '用人单位',
       dataIndex: '用人单位',
       ellipsis: true,
-      render: (val) => <Tooltip content={val}>{val}</Tooltip>
+      render: (val) => (
+        <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val}</div>} getPopupContainer={(node) => node.parentNode}>
+          {val}
+        </Tooltip>
+      )
     },
     {
       title: '职位名称',
       dataIndex: '职位名称',
       ellipsis: true,
-      render: (val) => <Tooltip content={val}>{val}</Tooltip>
+      render: (val) => (
+        <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val}</div>} getPopupContainer={(node) => node.parentNode}>
+          {val}
+        </Tooltip>
+      )
     },
     {
       title: '招录',
@@ -155,20 +166,32 @@ export default function PositionList() {
       title: '研究生专业',
       dataIndex: '研究生专业',
       ellipsis: true,
-      render: (val) => <Tooltip content={val || '不限'}>{val || '不限'}</Tooltip>
+      render: (val) => (
+        <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val || '不限'}</div>} getPopupContainer={(node) => node.parentNode}>
+          {val || '不限'}
+        </Tooltip>
+      )
     },
     {
       title: '本科专业',
       dataIndex: '本科专业',
       ellipsis: true,
-      render: (val) => <Tooltip content={val || '不限'}>{val || '不限'}</Tooltip>
+      render: (val) => (
+        <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val || '不限'}</div>} getPopupContainer={(node) => node.parentNode}>
+          {val || '不限'}
+        </Tooltip>
+      )
     },
     {
       title: '招录对象',
       dataIndex: '招录对象',
       width: 120,
       ellipsis: true,
-      render: (val) => <Tooltip content={val || '不限'}>{val || '不限'}</Tooltip>
+      render: (val) => (
+        <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val || '不限'}</div>} getPopupContainer={(node) => node.parentNode}>
+          {val || '不限'}
+        </Tooltip>
+      )
     },
     {
       title: '操作',
@@ -207,25 +230,38 @@ export default function PositionList() {
           onValuesChange={(changed) => {
             if (changed.city !== undefined) setSelectedCity(changed.city)
             if (changed.education !== undefined) setSelectedEducation(changed.education)
+            if (changed.target !== undefined) setSelectedTarget(changed.target)
             if (changed.keyword !== undefined) setKeyword(changed.keyword)
           }}
-          initialValues={{ city: '武汉市', education: undefined, keyword: '' }}
+          initialValues={{ city: '武汉市', education: '', target: '', keyword: '' }}
         >
           <Row gutter={[24, 0]} align="end">
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item label="工作地点" field="city">
-                <Select placeholder="选择地区" allowClear>
+            <Col xs={24} sm={12} md={4}>
+              <Form.Item label="工作地点" field="city" htmlFor="city_input">
+                <Select id="city_input" placeholder="选择地区" allowClear>
+                  <Select.Option key="all" value="">全部</Select.Option>
                   {filters.cities?.map((city) => (
                     <Select.Option key={city} value={city}>{city}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item label="学历要求" field="education">
-                <Select placeholder="选择学历" allowClear>
+            <Col xs={24} sm={12} md={4}>
+              <Form.Item label="学历要求" field="education" htmlFor="education_input">
+                <Select id="education_input" placeholder="选择学历" allowClear>
+                  <Select.Option key="all" value="">全部</Select.Option>
                   {filters.education?.map((edu) => (
                     <Select.Option key={edu} value={edu}>{edu}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={4}>
+              <Form.Item label="招录对象" field="target" htmlFor="target_input">
+                <Select id="target_input" placeholder="选择对象" allowClear>
+                  <Select.Option key="all" value="">全部</Select.Option>
+                  {filters.targets?.map((target) => (
+                    <Select.Option key={target} value={target}>{target}</Select.Option>
                   ))}
                 </Select>
               </Form.Item>

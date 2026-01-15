@@ -73,6 +73,13 @@
   max-width: 320px;
 }
 
+@media (min-width: 641px) {
+  .position-detail-modal-arco {
+    width: 1200px !important;
+    max-width: 95vw !important;
+  }
+}
+
 @media (max-width: 640px) {
   .modal-footer-arco .arco-btn {
     max-width: 100%;

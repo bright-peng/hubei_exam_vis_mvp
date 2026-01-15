@@ -14,6 +14,7 @@ export default function PositionList() {
   // 筛选条件
   const [selectedCity, setSelectedCity] = useState('武汉市')
   const [selectedEducation, setSelectedEducation] = useState('')
+  const [selectedTarget, setSelectedTarget] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
@@ -25,7 +26,8 @@ export default function PositionList() {
 
   useEffect(() => {
     loadPositions()
-  }, [page, selectedCity, selectedEducation, selectedDate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, selectedCity, selectedEducation, selectedTarget, selectedDate])
 
   const loadFilters = async () => {
     try {
@@ -46,6 +48,7 @@ export default function PositionList() {
       }
       if (selectedCity) params.city = selectedCity
       if (selectedEducation) params.education = selectedEducation
+      if (selectedTarget) params.target = selectedTarget
       if (keyword) params.keyword = keyword
 
       const data = await getPositions(params)
@@ -66,6 +69,7 @@ export default function PositionList() {
   const handleReset = () => {
     setSelectedCity('武汉市')
     setSelectedEducation('')
+    setSelectedTarget('')
     setSelectedDate('')
     setKeyword('')
     setPage(1)
@@ -87,8 +91,9 @@ export default function PositionList() {
         </div>
         <div className="filter-grid">
           <div className="filter-item">
-            <label>工作地点</label>
+            <label htmlFor="filter-city">工作地点</label>
             <select
+              id="filter-city"
               className="select"
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
@@ -103,8 +108,9 @@ export default function PositionList() {
           </div>
 
           <div className="filter-item">
-            <label>学历要求</label>
+            <label htmlFor="filter-education">学历要求</label>
             <select
+              id="filter-education"
               className="select"
               value={selectedEducation}
               onChange={(e) => setSelectedEducation(e.target.value)}
@@ -118,9 +124,27 @@ export default function PositionList() {
             </select>
           </div>
 
+          <div className="filter-item">
+            <label htmlFor="filter-target">招录对象</label>
+            <select
+              id="filter-target"
+              className="select"
+              value={selectedTarget}
+              onChange={(e) => setSelectedTarget(e.target.value)}
+            >
+              <option value="">全部对象</option>
+              {filters.targets?.map((target) => (
+                <option key={target} value={target}>
+                  {target}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="filter-item keyword-filter">
-            <label>关键词搜索</label>
+            <label htmlFor="filter-keyword">关键词搜索</label>
             <input
+              id="filter-keyword"
               type="text"
               className="input"
               placeholder="搜索职位、机关、简介、专业..."
@@ -146,10 +170,11 @@ export default function PositionList() {
         <span>
           共找到 <strong>{total.toLocaleString()}</strong> 个职位
         </span>
-        {(selectedCity || selectedEducation || keyword) && (
+        {(selectedCity || selectedEducation || selectedTarget || keyword) && (
           <span className="filter-tags">
             {selectedCity && <span className="tag">{selectedCity}</span>}
             {selectedEducation && <span className="tag">{selectedEducation}</span>}
+            {selectedTarget && <span className="tag">{selectedTarget}</span>}
             {keyword && <span className="tag">"{keyword}"</span>}
           </span>
         )}
@@ -195,8 +220,8 @@ export default function PositionList() {
                     return (
                       <tr key={pos.职位代码}>
                         <td className="code">{pos.职位代码}</td>
-                        <td className="org">{pos.用人单位}</td>
-                        <td className="name">{pos.职位名称}</td>
+                        <td className="org" title={pos.用人单位}>{pos.用人单位}</td>
+                        <td className="name" title={pos.职位名称}>{pos.职位名称}</td>
                         <td className="center">{pos.招录人数}</td>
                         <td className="center">
                           <span className={isHot ? 'hot-value' : isCold ? 'cold-value' : ''}>
@@ -210,7 +235,7 @@ export default function PositionList() {
                         </td>
                         <td className="major" title={pos.研究生专业}>{pos.研究生专业 || '不限'}</td>
                         <td className="major" title={pos.本科专业}>{pos.本科专业 || '不限'}</td>
-                        <td className="tags">{pos.招录对象 || '不限'}</td>
+                        <td className="tags" title={pos.招录对象 || '不限'}>{pos.招录对象 || '不限'}</td>
                         <td className="actions">
                           <button className="btn-detail" onClick={() => handleShowDetail(pos)}>
                             详情

@@ -46,7 +46,29 @@ def init_db():
     """)
     
     conn.commit()
+    
+    # Check for migration
+    _migrate_db(conn)
+    
     conn.close()
+
+def _migrate_db(conn):
+    """Check and update schema if needed"""
+    try:
+        cursor = conn.cursor()
+        
+        # Check positions table columns
+        cursor.execute("PRAGMA table_info(positions)")
+        columns = [row['name'] for row in cursor.fetchall()]
+        
+        if 'positions' in [t[0] for t in cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]:
+             if 'target' not in columns:
+                print("Migrating schema: Adding 'target' column to positions table...")
+                cursor.execute("ALTER TABLE positions ADD COLUMN target TEXT")
+                cursor.execute("UPDATE positions SET target = ''")
+                conn.commit()
+    except Exception as e:
+        print(f"Schema migration warning: {e}")
 
 def save_positions(df):
     """Save/update positions from dataframe"""
@@ -117,7 +139,7 @@ def save_applications(df, report_date):
     conn.commit()
     conn.close()
 
-def get_positions_with_stats(date=None, city=None, education=None, keyword=None, district=None, limit=1000, offset=0):
+def get_positions_with_stats(date=None, city=None, education=None, target=None, keyword=None, district=None, limit=1000, offset=0):
     """Unified query for positions and stats"""
     conn = get_db_connection()
     
@@ -147,13 +169,18 @@ def get_positions_with_stats(date=None, city=None, education=None, keyword=None,
     if education:
         query += " AND p.education LIKE ?"
         params.append(f"%{education}%")
+    if target:
+        query += " AND p.target LIKE ?"
+        params.append(f"%{target}%")
     if keyword:
         query += """ AND (
-            p.name LIKE ? OR p.org LIKE ? OR p.unit LIKE ? OR 
-            p.major_pg LIKE ? OR p.major_ug LIKE ? OR p.intro LIKE ? OR p.notes LIKE ?
+            p.code LIKE ? OR p.name LIKE ? OR p.org LIKE ? OR p.unit LIKE ? OR 
+            p.city LIKE ? OR p.district LIKE ? OR p.education LIKE ? OR p.degree LIKE ? OR
+            p.major_pg LIKE ? OR p.major_ug LIKE ? OR p.target LIKE ? OR 
+            p.intro LIKE ? OR p.notes LIKE ?
         )"""
         k = f"%{keyword}%"
-        params.extend([k, k, k, k, k, k, k])
+        params.extend([k] * 13)
         
     # Count total for pagination
     count_query = f"SELECT COUNT(*) FROM ({query})"

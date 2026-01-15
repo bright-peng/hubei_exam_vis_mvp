@@ -34,8 +34,8 @@ const PositionDetailModal = ({ position, onClose }) => {
       visible={!!position}
       onCancel={onClose}
       footer={null}
-      width="90%"
-      style={{ maxWidth: '720px' }}
+      width={1000}
+      style={{ maxWidth: '95vw' }}
       className="position-detail-modal-arco"
     >
       <Descriptions

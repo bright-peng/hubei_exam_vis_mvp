@@ -330,6 +330,7 @@ async def get_available_dates():
 async def get_positions(
     city: Optional[str] = None,
     education: Optional[str] = None,
+    target: Optional[str] = None,
     keyword: Optional[str] = None,
     date: Optional[str] = None,
     page: int = 1,
@@ -344,6 +345,7 @@ async def get_positions(
             date=date, 
             city=city, 
             education=education, 
+            target=target,
             keyword=keyword, 
             limit=limit, 
             offset=offset
@@ -766,6 +768,7 @@ async def get_filters():
     # 学历和学位信息可以从数据库中动态获取，或者保持读取 Excel (如果数据库没初始化)
     education = []
     degree = []
+    targets = []
     
     try:
         conn = get_db_connection()
@@ -778,6 +781,10 @@ async def get_filters():
         # 获取所有学位
         cursor.execute("SELECT DISTINCT degree FROM positions WHERE degree != '' AND degree IS NOT NULL")
         degree = sorted([row[0] for row in cursor.fetchall()])
+
+        # 获取所有招录对象
+        cursor.execute("SELECT DISTINCT target FROM positions WHERE target != '' AND target IS NOT NULL")
+        targets = sorted([row[0] for row in cursor.fetchall()])
         
         conn.close()
     except Exception as e:
@@ -789,11 +796,14 @@ async def get_filters():
                  education = sorted([e for e in df['学历'].dropna().unique().tolist() if e])
              if '学位' in df.columns:
                  degree = sorted([d for d in df['学位'].dropna().unique().tolist() if d])
+             if '招录对象' in df.columns:
+                 targets = sorted([t for t in df['招录对象'].dropna().unique().tolist() if t])
 
     return {
         "cities": cities,
         "education": education,
-        "degree": degree
+        "degree": degree,
+        "targets": targets
     }
 
 

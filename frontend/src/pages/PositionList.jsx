@@ -108,14 +108,18 @@ export default function PositionList() {
       if (momentumType) {
           try {
              // Use cached availableDates instead of re-fetching
-             const allDates = availableDates.length > 0 ? availableDates : await getAvailableDates()
+             let allDates = availableDates.length > 0 ? availableDates : await getAvailableDates()
+             
+             // Ensure dates are sorted descending (latest first) to correct momentum calculation
+             allDates = [...allDates].sort().reverse()
+
              // Use selectedDate if present, else latest date
              const baseDate = selectedDate || (allDates && allDates.length > 0 ? allDates[0] : null)
              
              if (baseDate) {
                  const baseIndex = allDates.indexOf(baseDate);
                  // Need previous date. If baseIndex is last one (oldest), no prev date.
-                 // allDates is usually [latest, ..., oldest]
+                 // allDates is now [latest, ..., oldest]
                  const prevDate = baseIndex >= 0 && baseIndex + 1 < allDates.length ? allDates[baseIndex + 1] : null;
                  
                  // If we have both dates (or handle logic inside getDailyMomentum to fallback)

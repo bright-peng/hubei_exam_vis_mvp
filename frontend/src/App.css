@@ -1,121 +1,174 @@
-/* App 组件样式 */
+/* App 组件样式 - 适配 Arco Design */
 
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+.app-layout {
+  background: transparent !important;
 }
 
-/* 头部 */
-.header {
+/* 头部 Arco 适配 */
+.header-arco {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(15, 15, 26, 0.85);
+  background: rgba(15, 15, 26, 0.8) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border);
+  padding: 0 !important;
+  height: auto !important;
+  line-height: normal !important;
 }
 
-.header-content {
-  max-width: 1400px;
+.header-content-arco {
+  max-width: 1440px;
   margin: 0 auto;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 0 var(--spacing-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-lg);
+  height: 72px;
 }
 
-/* Logo */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.logo-icon {
+/* Logo Arco 适配 */
+.logo-icon-arco {
   font-size: 2rem;
 }
 
-.logo-text h1 {
-  font-size: 1.25rem;
-  font-weight: 600;
+.logo-text-arco .arco-typography {
   background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.2;
 }
 
-.logo-subtitle {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+/* 导航 Menu 适配 */
+.header-menu-arco {
+  background: transparent !important;
+  border: none !important;
+  flex: 1;
+  justify-content: flex-end;
 }
 
-/* 导航 */
-.nav {
-  display: flex;
-  gap: var(--spacing-xs);
+.header-menu-arco .arco-menu-inner {
+  padding: 0;
 }
 
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.875rem;
+.header-menu-arco .arco-menu-item {
+  background: transparent !important;
+  font-size: 0.95rem;
   font-weight: 500;
-  border-radius: var(--border-radius);
   transition: all var(--transition-fast);
+  margin: 0 4px;
+  border-radius: var(--border-radius);
 }
 
-.nav-link:hover {
-  color: var(--text-primary);
-  background: var(--glass-bg);
+.header-menu-arco .arco-menu-item:hover,
+.header-menu-arco .arco-menu-selected {
+  color: #fff !important;
 }
 
-.nav-link.active {
-  color: var(--text-primary);
-  background: var(--primary-gradient);
+.header-menu-arco .arco-menu-selected {
+  background: var(--primary-gradient) !important;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.nav-icon {
-  font-size: 1rem;
+.header-menu-arco .arco-menu-selected .arco-icon {
+  color: #fff !important;
 }
 
-/* 主内容 */
-.main-content {
-  flex: 1;
-  padding: var(--spacing-lg);
+/* 主内容 Arco 适配 */
+.main-content-arco {
+  padding: var(--spacing-lg) 0;
 }
 
-/* 底部 */
-.footer {
+.container-arco {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+/* 底部 Arco 适配 */
+.footer-arco {
   text-align: center;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-xl);
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   border-top: 1px solid var(--glass-border);
+  background: rgba(15, 15, 26, 0.5);
+}
+
+.mobile-menu-trigger {
+  display: none !important;
 }
 
 /* 响应式 */
 @media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: var(--spacing-md);
+  :root {
+    --spacing-lg: 12px;
+    --spacing-xl: 20px;
+  }
+
+  .header-content-arco {
+    flex-direction: row;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 12px;
   }
   
-  .nav {
-    flex-wrap: wrap;
+  .mobile-menu-trigger {
+    display: flex !important;
+    align-items: center;
     justify-content: center;
+    font-size: 24px;
+  }
+
+  /* 抽屉样式优化 */
+  .mobile-drawer-arco .arco-drawer-content {
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--glass-border);
+  }
+
+  .mobile-drawer-arco .arco-menu {
+    background: transparent;
+  }
+
+  .mobile-drawer-arco .arco-menu-item {
+    background: transparent !important;
   }
   
-  .nav-link {
-    padding: var(--spacing-xs) var(--spacing-sm);
+  .logo-icon-arco {
+    font-size: 1.5rem;
+  }
+
+  .logo-text-arco h5 {
+    font-size: 14px !important;
+  }
+
+  .logo-text-arco div {
+    display: none; /* 移动端隐藏副标题 */
+  }
+
+  .header-menu-arco {
+    display: none; /* 暂时隐藏菜单，可后续考虑抽屉 */
+  }
+  
+  .main-content-arco {
+    padding: 12px 0;
+  }
+
+  .container-arco {
+    padding: 0 12px;
+  }
+  
+  .footer-arco {
+    padding: 20px 12px;
     font-size: 0.75rem;
+  }
+}
+
+/* 针对手机浏览器的滚动优化 */
+@media (pointer: coarse) {
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 }

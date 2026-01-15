@@ -1,20 +1,41 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
+import { 
+  Card, 
+  Grid, 
+  Typography, 
+  Upload, 
+  DatePicker, 
+  Button, 
+  Space, 
+  Alert, 
+  Message, 
+  Tag, 
+  Timeline, 
+  Divider,
+  Empty
+} from '@arco-design/web-react'
+import { 
+  IconUpload, 
+  IconFile, 
+  IconCalendar, 
+  IconBulb, 
+  IconCheckCircle, 
+  IconCloseCircle
+} from '@arco-design/web-react/icon'
 import { uploadPositions, uploadDaily, getSummary } from '../api'
 import './DataUpload.css'
+
+const { Row, Col } = Grid
+const { Title, Text, Paragraph } = Typography
 
 export default function DataUpload() {
   const [positionFile, setPositionFile] = useState(null)
   const [dailyFile, setDailyFile] = useState(null)
   const [dailyDate, setDailyDate] = useState(new Date().toISOString().split('T')[0])
   const [uploading, setUploading] = useState(false)
-  const [message, setMessage] = useState(null)
   const [summary, setSummary] = useState(null)
 
-  const positionInputRef = useRef(null)
-  const dailyInputRef = useRef(null)
-
-  // 加载摘要信息
-  React.useEffect(() => {
+  useEffect(() => {
     loadSummary()
   }, [])
 
@@ -29,26 +50,21 @@ export default function DataUpload() {
 
   const handlePositionUpload = async () => {
     if (!positionFile) {
-      setMessage({ type: 'error', text: '请选择职位表文件' })
+      Message.warning('请选择职位表文件')
       return
     }
 
     try {
       setUploading(true)
-      setMessage(null)
       const result = await uploadPositions(positionFile)
-      setMessage({
-        type: 'success',
-        text: `✅ 职位表上传成功！共 ${result.stats.total_positions} 个职位，计划招录 ${result.stats.total_quota} 人`,
+      Message.success({
+        content: `职位表上传成功！共 ${result.stats.total_positions} 个职位`,
+        duration: 5000
       })
       setPositionFile(null)
-      if (positionInputRef.current) positionInputRef.current.value = ''
       loadSummary()
     } catch (error) {
-      setMessage({
-        type: 'error',
-        text: `❌ 上传失败: ${error.response?.data?.detail || error.message}`,
-      })
+      Message.error(`上传失败: ${error.response?.data?.detail || error.message}`)
     } finally {
       setUploading(false)
     }
@@ -56,195 +72,180 @@ export default function DataUpload() {
 
   const handleDailyUpload = async () => {
     if (!dailyFile) {
-      setMessage({ type: 'error', text: '请选择每日报名数据文件' })
+      Message.warning('请选择每日报名数据文件')
       return
     }
 
     try {
       setUploading(true)
-      setMessage(null)
       const result = await uploadDaily(dailyFile, dailyDate)
-      setMessage({
-        type: 'success',
-        text: `✅ ${dailyDate} 报名数据上传成功！共 ${result.stats.total_applicants.toLocaleString()} 人报名`,
+      Message.success({
+        content: `${dailyDate} 报名数据上传成功！`,
+        duration: 5000
       })
       setDailyFile(null)
-      if (dailyInputRef.current) dailyInputRef.current.value = ''
       loadSummary()
     } catch (error) {
-      setMessage({
-        type: 'error',
-        text: `❌ 上传失败: ${error.response?.data?.detail || error.message}`,
-      })
+      Message.error(`上传失败: ${error.response?.data?.detail || error.message}`)
     } finally {
       setUploading(false)
     }
   }
 
   return (
-    <div className="data-upload fade-in">
-      <div className="upload-header">
-        <h2>📤 数据上传中心</h2>
-        <p>上传职位表和每日报名数据，系统将自动进行分析可视化</p>
+    <div className="data-upload-arco fade-in">
+      <div style={{ marginBottom: 32 }}>
+        <Title heading={3}>📤 数据上传中心</Title>
+        <Text type="secondary">上传职位表和每日报名数据，系统将自动进行分析可视化</Text>
       </div>
 
-      {/* 消息提示 */}
-      {message && (
-        <div className={`message ${message.type}`}>
-          {message.text}
-        </div>
-      )}
-
-      <div className="upload-grid">
+      <Row gutter={24}>
         {/* 职位表上传 */}
-        <div className="glass-card upload-card">
-          <div className="upload-icon">📋</div>
-          <h3>上传职位表</h3>
-          <p className="upload-desc">
-            上传招考职位表（Excel格式），包含职位代码、招录机关、工作地点、学历要求等信息
-          </p>
-          
-          <div className="upload-area">
-            <input
-              ref={positionInputRef}
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={(e) => setPositionFile(e.target.files[0])}
-              id="position-file"
-            />
-            <label htmlFor="position-file" className="upload-label">
-              <span className="upload-btn-icon">📁</span>
-              <span>{positionFile ? positionFile.name : '点击选择文件'}</span>
-            </label>
-          </div>
-
-          <div className="expected-fields">
-            <strong>预期字段：</strong>
-            <span>职位代码、招录机关、用人单位、职位名称、工作地点、招录人数、学历、学位、专业、备注</span>
-          </div>
-
-          <button
-            className="btn btn-primary upload-btn"
-            onClick={handlePositionUpload}
-            disabled={uploading || !positionFile}
+        <Col span={12}>
+          <Card 
+            bordered={false} 
+            className="glass-card-arco upload-card-arco"
+            title={<Space><IconFile /> 职位库维护</Space>}
           >
-            {uploading ? '上传中...' : '上传职位表'}
-          </button>
-
-          {summary?.has_positions && (
-            <div className="upload-status success">
-              ✅ 已上传职位表 ({summary.total_positions} 个职位)
-            </div>
-          )}
-        </div>
-
-        {/* 每日报名数据上传 */}
-        <div className="glass-card upload-card">
-          <div className="upload-icon">📊</div>
-          <h3>上传每日报名数据</h3>
-          <p className="upload-desc">
-            上传每日报名统计数据（Excel格式），包含职位代码、报名人数、审核通过人数等
-          </p>
-
-          <div className="date-picker">
-            <label>选择日期</label>
-            <input
-              type="date"
-              className="input"
-              value={dailyDate}
-              onChange={(e) => setDailyDate(e.target.value)}
-            />
-          </div>
-
-          <div className="upload-area">
-            <input
-              ref={dailyInputRef}
-              type="file"
+            <Paragraph type="secondary">
+              上传招考职位表（Excel格式），包含职位代码、名称、地点、学历要求等。
+            </Paragraph>
+            
+            <Upload
+              drag
               accept=".xlsx,.xls"
-              onChange={(e) => setDailyFile(e.target.files[0])}
-              id="daily-file"
-            />
-            <label htmlFor="daily-file" className="upload-label">
-              <span className="upload-btn-icon">📁</span>
-              <span>{dailyFile ? dailyFile.name : '点击选择文件'}</span>
-            </label>
-          </div>
-
-          <div className="expected-fields">
-            <strong>预期字段：</strong>
-            <span>职位代码、报名人数、审核通过人数、缴费人数（可选）</span>
-          </div>
-
-          <button
-            className="btn btn-success upload-btn"
-            onClick={handleDailyUpload}
-            disabled={uploading || !dailyFile}
-          >
-            {uploading ? '上传中...' : '上传报名数据'}
-          </button>
-
-          {summary?.daily_files?.length > 0 && (
-            <div className="upload-status success">
-              ✅ 已上传 {summary.daily_files.length} 天数据
-              <br />
-              <small>最新: {summary.latest_date}</small>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 上传说明 */}
-      <div className="glass-card instructions">
-        <h3 className="section-title">📖 使用说明</h3>
-        <div className="instruction-content">
-          <div className="instruction-block">
-            <h4>1. 上传职位表（首次使用）</h4>
-            <p>
-              将官方发布的招考职位表（Excel格式）上传至系统。系统会自动解析职位信息，
-              提取工作地点进行地区分组统计。
-            </p>
-          </div>
-
-          <div className="instruction-block">
-            <h4>2. 每日更新报名数据</h4>
-            <p>
-              每天下载最新的报名统计数据，选择对应日期后上传。系统会自动关联职位表，
-              计算竞争比、生成趋势图表。
-            </p>
-          </div>
-
-          <div className="instruction-block">
-            <h4>3. 查看可视化报告</h4>
-            <p>
-              数据上传后，可以在「总览」页面查看统计摘要，在「地图」页面查看各地区报名分布，
-              在「趋势」页面查看每日变化趋势。
-            </p>
-          </div>
-
-          <div className="instruction-block tip">
-            <h4>💡 提示</h4>
-            <p>
-              Excel文件的第一行应为表头，系统会自动识别字段。确保职位代码字段一致，
-              以便正确关联报名数据和职位信息。
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 已上传数据列表 */}
-      {summary?.daily_files?.length > 0 && (
-        <div className="glass-card">
-          <h3 className="section-title">📅 已上传的每日数据</h3>
-          <div className="daily-files-list">
-            {summary.daily_files.map((date) => (
-              <div key={date} className="daily-file-item">
-                <span className="file-icon">📄</span>
-                <span className="file-date">{date}</span>
+              multiple={false}
+              autoUpload={false}
+              onRemove={() => setPositionFile(null)}
+              onChange={(_, file) => setPositionFile(file.originFile)}
+              limit={1}
+            >
+              <div className="upload-drag-area">
+                <IconUpload style={{ fontSize: 32, color: 'var(--primary-color)' }} />
+                <Text style={{ marginTop: 12 }}>点击或拖拽文件到这里上传职位表</Text>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </Upload>
+
+            <Alert
+              type="info"
+              showIcon
+              icon={<IconBulb />}
+              style={{ marginTop: 16 }}
+              content="支持字段：代码、机关、地点、人数、学历、专业等"
+            />
+
+            <Button 
+              type="primary" 
+              long 
+              loading={uploading} 
+              disabled={!positionFile}
+              onClick={handlePositionUpload}
+              style={{ marginTop: 24 }}
+            >
+              执行上传
+            </Button>
+
+            {summary?.has_positions && (
+              <div className="status-badge success">
+                <IconCheckCircle /> 已同步 {summary.total_positions} 个职位
+              </div>
+            )}
+          </Card>
+        </Col>
+
+        {/* 报名数据上传 */}
+        <Col span={12}>
+          <Card 
+            bordered={false} 
+            className="glass-card-arco upload-card-arco"
+            title={<Space><IconUpload /> 每日数据更新</Space>}
+          >
+            <Paragraph type="secondary">
+              选择对应的日期，上传官方每日发布的报名统计Excel文件。
+            </Paragraph>
+
+            <div style={{ marginBottom: 16 }}>
+              <Text style={{ display: 'block', marginBottom: 8 }}>数据所属日期：</Text>
+              <DatePicker 
+                style={{ width: '100%' }}
+                value={dailyDate} 
+                onChange={(val) => setDailyDate(val)} 
+              />
+            </div>
+            
+            <Upload
+              drag
+              accept=".xlsx,.xls"
+              multiple={false}
+              autoUpload={false}
+              onRemove={() => setDailyFile(null)}
+              onChange={(_, file) => setDailyFile(file.originFile)}
+              limit={1}
+            >
+              <div className="upload-drag-area">
+                <IconUpload style={{ fontSize: 32, color: '#00d0b1' }} />
+                <Text style={{ marginTop: 12 }}>点击或拖拽文件到这里上传报名数据</Text>
+              </div>
+            </Upload>
+
+            <Button 
+              type="primary" 
+              long 
+              status="success"
+              loading={uploading} 
+              disabled={!dailyFile}
+              onClick={handleDailyUpload}
+              style={{ marginTop: 24 }}
+            >
+              同步报名进度
+            </Button>
+
+            {summary?.daily_files?.length > 0 && (
+              <div className="status-badge info">
+                <IconCalendar /> 已积累 {summary.daily_files.length} 天的历史数据
+              </div>
+            )}
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={24} style={{ marginTop: 24 }}>
+        <Col span={16}>
+          <Card title="引导说明" bordered={false} className="glass-card-arco">
+            <Timeline>
+              <Timeline.Item label="第一步" dot={<IconFile style={{color: '#165dff'}} />}>
+                <Title heading={6}>职位库初始化</Title>
+                <Paragraph>将官方职位表 Excel 上传，建立基础职位索引。仅需上传一次。</Paragraph>
+              </Timeline.Item>
+              <Timeline.Item label="第二步" dot={<IconCalendar style={{color: '#ff7d00'}} />}>
+                <Title heading={6}>报名数据轮询</Title>
+                <Paragraph>每日下载官方汇总表，选择日期并上传。系统会自动计算竞争比并生成趋势图。</Paragraph>
+              </Timeline.Item>
+              <Timeline.Item label="第三步" dot={<IconCheckCircle style={{color: '#00b42a'}} />}>
+                <Title heading={6}>多维深度可视化</Title>
+                <Paragraph>在「总览」、「职位列表」等模块查看全省实时的报考冷热趋势。</Paragraph>
+              </Timeline.Item>
+            </Timeline>
+          </Card>
+        </Col>
+        
+        <Col span={8}>
+          <Card title="已录入日期" bordered={false} className="glass-card-arco">
+            {summary?.daily_files?.length > 0 ? (
+              <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                {summary.daily_files.sort().reverse().map((date) => (
+                  <div key={date} style={{ padding: '8px 0', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between' }}>
+                    <Text>{date}</Text>
+                    <Tag size="small" color="arcoblue">已同步</Tag>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Empty description="暂无历史数据" />
+            )}
+          </Card>
+        </Col>
+      </Row>
     </div>
   )
 }

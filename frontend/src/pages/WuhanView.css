@@ -1,167 +1,76 @@
-/* 武汉市视图样式 */
-.wuhan-view {
-  padding: 24px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+/* 武汉市视图样式 - 适配 Arco Design */
+
+.wuhan-view-arco {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.wuhan-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding: 24px;
-  background: rgba(30, 41, 59, 0.6);
-  border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-}
-
-.header-left h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #a78bfa, #60a5fa);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0;
-}
-
-.header-left .subtitle {
-  color: #94a3b8;
-  margin: 4px 0 0 0;
-  font-size: 0.9rem;
-}
-
-.header-stats {
-  display: flex;
-  gap: 32px;
-}
-
-.header-stats .stat-item {
-  text-align: center;
-}
-
-.header-stats .stat-value {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #f1f5f9;
-}
-
-.header-stats .stat-label {
-  font-size: 0.8rem;
-  color: #94a3b8;
-}
-
-/* 主内容区 */
-.wuhan-content {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 24px;
-}
-
-/* 地图容器 */
-.district-map-container {
-  background: rgba(30, 41, 59, 0.6);
-  border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  padding: 20px;
-}
-
-.map-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.control-label {
-  color: #94a3b8;
-  font-size: 0.9rem;
-}
-
-.control-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  background: rgba(139, 92, 246, 0.1);
-  color: #c4b5fd;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.85rem;
-}
-
-.control-btn:hover {
-  background: rgba(139, 92, 246, 0.2);
-}
-
-.control-btn.active {
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
-  color: white;
-  border-color: transparent;
-}
-
-/* 地图 SVG */
-.district-map {
+/* 地图气泡样式 */
+.district-map-arco {
   position: relative;
-  aspect-ratio: 1.2;
-  background: rgba(15, 23, 42, 0.5);
+  height: 480px; /* 与右侧列表基础高度保持一致 */
+  background: rgba(15, 23, 42, 0.4);
   border-radius: 12px;
   overflow: hidden;
+  margin-bottom: 12px;
 }
 
-.wuhan-svg {
+.wuhan-svg-arco {
   width: 100%;
   height: 100%;
 }
 
-.district-bubble {
+.district-bubble-arco {
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bubble-circle-arco {
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 0.15;
   transition: all 0.3s ease;
 }
 
-.district-bubble:hover .bubble-circle {
-  filter: brightness(1.2);
-  transform-origin: center;
+.district-bubble-arco:hover .bubble-circle-arco {
+  filter: brightness(1.2) saturate(1.2);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 0.3;
 }
 
-.district-bubble.selected .bubble-circle {
-  filter: brightness(1.3) drop-shadow(0 0 10px rgba(139, 92, 246, 0.8));
+.district-bubble-arco.selected .bubble-circle-arco {
+  filter: brightness(1.3) drop-shadow(0 0 8px rgba(102, 126, 234, 0.8));
+  stroke: #fff;
+  stroke-width: 0.5;
 }
 
-.bubble-circle {
-  transition: all 0.3s ease;
-}
-
-.bubble-name {
-  font-size: 1.5px;
-  fill: white;
+.bubble-name-arco {
+  font-size: 1.6px;
+  fill: #fff;
   font-weight: 600;
   pointer-events: none;
-  text-shadow: 0 0 3px rgba(0,0,0,0.8);
+  text-shadow: 0 0 2px rgba(0,0,0,0.8);
 }
 
-.bubble-value {
+.bubble-value-arco {
   font-size: 1.8px;
-  fill: rgba(255,255,255,0.9);
+  fill: rgba(255, 255, 255, 0.85);
   font-weight: 500;
   pointer-events: none;
 }
 
 /* 图例 */
-.map-legend {
-  margin-top: 16px;
+.map-legend-arco {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 12px;
+  padding: 8px 0;
 }
 
-.legend-gradient {
-  width: 200px;
-}
-
-.gradient-bar {
-  height: 8px;
-  border-radius: 4px;
+.gradient-bar-arco {
+  width: 160px;
+  height: 6px;
+  border-radius: 3px;
   background: linear-gradient(90deg, 
     hsl(260, 40%, 65%),
     hsl(230, 60%, 50%),
@@ -169,291 +78,72 @@
   );
 }
 
-.gradient-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  font-size: 0.75rem;
-  color: #94a3b8;
-}
-
-/* 区域列表 */
-.district-list {
-  background: rgba(30, 41, 59, 0.6);
-  border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  padding: 20px;
-  max-height: calc(100vh - 200px);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.district-list h3 {
-  color: #f1f5f9;
-  margin: 0 0 16px 0;
-  font-size: 1.1rem;
-}
-
-.list-header {
-  display: grid;
-  grid-template-columns: 60px 1fr 50px 50px 70px 60px;
-  gap: 8px;
-  padding: 10px 12px;
-  background: rgba(139, 92, 246, 0.1);
-  border-radius: 8px;
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin-bottom: 8px;
-}
-
-.list-body {
-  flex: 1;
+/* 侧边列表 */
+.district-rank-list-arco {
+  height: 532px; /* 480px(地图) + 12px(margin) + 40px(图例约值) */
   overflow-y: auto;
+  padding-right: 4px;
 }
 
-.list-item {
-  display: grid;
-  grid-template-columns: 30px 1fr 50px 50px 70px 60px;
-  gap: 8px;
+.rank-item-arco {
+  display: flex;
+  align-items: center;
   padding: 12px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid transparent;
-}
-
-.list-item:hover {
-  background: rgba(139, 92, 246, 0.1);
-}
-
-.list-item.selected {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.4);
-}
-
-.list-item .rank {
-  font-weight: 600;
-  color: #a78bfa;
-}
-
-.list-item .name {
-  color: #f1f5f9;
-  font-weight: 500;
-}
-
-.list-item .positions,
-.list-item .quota {
-  color: #94a3b8;
-  text-align: right;
-}
-
-.list-item .applicants {
-  color: #60a5fa;
-  font-weight: 600;
-  text-align: right;
-}
-
-.list-item .ratio {
-  color: #f472b6;
-  font-weight: 500;
-  text-align: right;
-}
-
-/* 职位详情面板 */
-.district-detail {
-  margin-top: 24px;
-  background: rgba(30, 41, 59, 0.6);
-  border-radius: 16px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  overflow: hidden;
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: rgba(139, 92, 246, 0.1);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-}
-
-.detail-header h3 {
-  margin: 0;
-  color: #f1f5f9;
-  font-size: 1.1rem;
-}
-
-.close-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
   cursor: pointer;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: all 0.2s ease;
 }
 
-.close-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
+.rank-item-arco:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--glass-border);
 }
 
-/* 职位表格 */
-.positions-table-wrapper {
-  max-height: 400px;
-  overflow: auto;
+.rank-item-arco.active {
+  background: rgba(22, 93, 255, 0.1);
+  border-color: rgba(22, 93, 255, 0.4);
 }
 
-.positions-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.positions-table th {
-  position: sticky;
-  top: 0;
-  background: rgba(30, 41, 59, 0.95);
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-weight: 600;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-}
-
-.positions-table td {
-  padding: 12px 16px;
-  font-size: 0.85rem;
-  color: #e2e8f0;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-}
-
-.positions-table tr:hover td {
-  background: rgba(139, 92, 246, 0.05);
-}
-
-.positions-table .code {
-  font-family: 'SF Mono', 'Monaco', monospace;
-  color: #a78bfa;
-  font-size: 0.8rem;
-}
-
-.positions-table .num {
-  text-align: center;
-  font-weight: 500;
-}
-
-.positions-table .ratio {
-  color: #f472b6;
-  font-weight: 500;
-}
-
-.empty-state {
-  padding: 40px;
-  text-align: center;
-  color: #64748b;
-}
-
-/* 加载状态 */
-.loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px;
-}
-
-.loading-spinner.small {
-  padding: 30px;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(139, 92, 246, 0.2);
-  border-top-color: #8b5cf6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.loading-spinner.small .spinner {
+.rank-no-arco {
   width: 24px;
   height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-right: 12px;
+  font-size: 12px;
+  font-weight: bold;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.rank-info-arco {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.loading-spinner p {
-  margin-top: 16px;
-  color: #94a3b8;
+.rank-value-arco {
+  text-align: right;
+}
+
+.rank-1 { background: #ff4d4f; color: #fff; }
+.rank-2 { background: #ff7a45; color: #fff; }
+.rank-3 { background: #ffa940; color: #fff; }
+
+.code-text-arco {
+  font-family: 'SF Mono', 'Monaco', monospace;
+  color: #fbbf24 !important;
+  font-size: 12px;
 }
 
 /* 响应式 */
 @media (max-width: 1200px) {
-  .wuhan-content {
-    grid-template-columns: 1fr;
+  .district-rank-list-arco {
+    height: auto;
+    max-height: 480px;
   }
-  
-  .district-list {
-    max-height: 400px;
-  }
-}
-
-@media (max-width: 768px) {
-  .wuhan-header {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-  }
-  
-  .header-stats {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .map-controls {
-    flex-wrap: wrap;
-  }
-}
-
-/* 飙升榜样式 */
-.surge-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.surge-value {
-  color: #d946ef !important;
-  font-weight: 700 !important;
-}
-
-.rank-cell {
-  width: 50px;
-  text-align: center;
-}
-
-.rank-badge {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  border-radius: 50%;
-  background: rgba(148, 163, 184, 0.2);
-  color: #94a3b8;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.rank-badge.top {
-  background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%);
-  color: white;
-  box-shadow: 0 2px 4px rgba(217, 70, 239, 0.3);
 }

@@ -174,49 +174,23 @@
   .map-view {
     grid-template-columns: 1fr;
     height: auto;
-    overflow: visible;
   }
   
   .map-container {
     min-height: 400px;
-    height: 50vh;
   }
   
   .sidebar {
-    height: auto;
-    overflow: visible;
+    flex-direction: row;
   }
   
   .city-list {
-    max-height: 400px;
+    max-height: 300px;
   }
 }
 
 @media (max-width: 640px) {
-  .map-view {
-    gap: 12px;
-  }
-  
-  .map-container {
-    padding: 12px;
-    height: 45vh;
-  }
-  
-  .view-toggle {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .toggle-btn {
-    padding: 4px 10px;
-    font-size: 12px;
-  }
-
   .sidebar {
-    gap: 12px;
-  }
-
-  .city-stats {
-    grid-template-columns: 1fr 1fr;
+    flex-direction: column;
   }
 }

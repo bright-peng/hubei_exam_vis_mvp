@@ -1,155 +1,128 @@
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 20px;
+/* PositionDetailModal 样式 - 适配 Arco Design */
+
+.position-detail-modal-arco .arco-modal-content {
+  background: var(--bg-secondary) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
 }
 
-.modal-content {
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: #1e293b;
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+.position-detail-modal-arco .arco-modal-header {
+  border-bottom: 1px solid var(--glass-border);
+  background: transparent !important;
 }
 
-.modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(251, 191, 36, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.position-detail-modal-arco .arco-modal-title {
+  color: var(--text-primary) !important;
 }
 
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #fbbf24;
+.position-detail-modal-arco .arco-divider-horizontal {
+  border-bottom: 1px solid var(--glass-border);
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  font-size: 2rem;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: #f87171;
-}
-
-.modal-body {
-  padding: 24px;
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.full-width {
-  grid-column: span 2;
-}
-
-.detail-item label {
-  display: block;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin-bottom: 6px;
-}
-
-.detail-item .value {
-  font-size: 1rem;
-  color: #e2e8f0;
-  font-weight: 500;
-}
-
-.detail-item .value.code {
-  font-family: 'SF Mono', 'Monaco', monospace;
-  color: #fbbf24;
-}
-
-.detail-item .value.highlight {
-  color: #60a5fa;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.text-block {
-  background: rgba(15, 23, 42, 0.4);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  line-height: 1.6;
-  font-size: 0.95rem !important;
-}
-
-.section-subtitle {
-  margin: 24px 0 16px;
-  font-size: 1.1rem;
-  color: #e2e8f0;
-  border-left: 4px solid #fbbf24;
-  padding-left: 12px;
-}
-
-.stats-row {
+/* 统计卡片样式 */
+.stats-container-arco {
   display: flex;
   gap: 20px;
 }
 
-.stat-box {
+.stat-item-arco {
   flex: 1;
-  background: rgba(251, 191, 36, 0.05);
+  background: rgba(255, 255, 255, 0.03);
   padding: 16px;
   border-radius: 12px;
-  border: 1px solid rgba(251, 191, 36, 0.1);
+  border: 1px solid var(--glass-border);
   text-align: center;
 }
 
-.stat-box label {
-  display: block;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin-bottom: 4px;
+.stat-label-arco {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
 }
 
-.stat-box .num {
-  font-size: 1.8rem;
+.stat-value-arco {
+  font-size: 24px;
   font-weight: 700;
+}
+
+.stat-value-arco.highlight {
+  color: #60a5fa;
+}
+
+.stat-value-arco.warning {
   color: #fbbf24;
 }
 
-.modal-footer {
-  padding: 20px 24px;
-  border-top: 1px solid rgba(251, 191, 36, 0.1);
+/* 覆盖 Descriptions 样式 */
+.position-detail-modal-arco .arco-descriptions-item-label {
+  background: transparent !important;
+  font-weight: normal !important;
+}
+
+.position-detail-modal-arco .arco-descriptions-item-value {
+  padding-bottom: 16px !important;
+}
+
+.modal-footer-arco {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+}
+
+.modal-footer-arco .arco-btn {
+  max-width: 320px;
 }
 
 @media (max-width: 640px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
+  .modal-footer-arco .arco-btn {
+    max-width: 100%;
   }
-  .full-width {
-    grid-column: span 1;
+  .position-detail-modal-arco {
+    width: 96% !important;
+    margin: 8px auto !important;
   }
-  .stats-row {
+
+  .position-detail-modal-arco .arco-modal {
+    top: 0 !important;
+    margin: 8px 0;
+  }
+
+  .position-detail-modal-arco .arco-modal-body {
+    padding: 16px !important;
+    overflow-y: auto;
+    max-height: calc(100vh - 120px) !important;
+  }
+
+  .position-detail-modal-arco .arco-modal-close-icon {
+    position: absolute;
+    top: 8px !important;
+    right: 8px !important;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff !important;
+    z-index: 1000;
+  }
+
+  .stats-container-arco {
     flex-direction: column;
+    gap: 12px;
+  }
+  
+  .stat-item-arco {
+    padding: 12px;
+  }
+  
+  .stat-value-arco {
+    font-size: 20px;
+  }
+
+  .position-detail-modal-arco .arco-descriptions-item-label {
+    width: 85px !important;
   }
 }

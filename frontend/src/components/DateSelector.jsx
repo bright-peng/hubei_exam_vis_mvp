@@ -1,42 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { getAvailableDates } from '../api';
-import './DateSelector.css';
+import React, { useState, useEffect } from 'react'
+import { Select, Space } from '@arco-design/web-react'
+import { IconCalendar } from '@arco-design/web-react/icon'
+import { getAvailableDates } from '../api'
 
 const DateSelector = ({ selectedDate, onDateChange }) => {
-  const [dates, setDates] = useState([]);
+  const [dates, setDates] = useState([])
 
   useEffect(() => {
-    loadDates();
-  }, []);
+    loadDates()
+  }, [])
 
   const loadDates = async () => {
     try {
-      const availableDates = await getAvailableDates();
-      setDates(availableDates);
-      // 如果没有选中日期且有可用日期，默认不自动切换，交由父组件决定
+      const availableDates = await getAvailableDates()
+      setDates(availableDates)
     } catch (error) {
-      console.error('加载可用日期失败:', error);
+      console.error('加载可用日期失败:', error)
     }
-  };
+  }
 
   return (
-    <div className="date-selector-container">
-      <label htmlFor="date-select">📅 查看日期：</label>
-      <select 
-        id="date-select"
-        className="date-select-dropdown"
-        value={selectedDate || ''}
-        onChange={(e) => onDateChange(e.target.value)}
-      >
-        <option value="">最新日期</option>
-        {dates.map(date => (
-          <option key={date} value={date}>
-            {date}
-          </option>
-        ))}
-      </select>
+    <div className="date-selector-arco">
+      <Space>
+        <IconCalendar style={{ color: 'var(--text-muted)' }} />
+        <Select
+          placeholder="选择日期"
+          style={{ width: 140 }}
+          value={selectedDate || ''}
+          onChange={(val) => onDateChange(val)}
+          size="small"
+          bordered={false}
+          triggerProps={{
+            autoAlignPopupWidth: false,
+            position: 'bl',
+          }}
+          className="date-select-arco"
+        >
+          <Select.Option value="">最新日期</Select.Option>
+          {dates.map(date => (
+            <Select.Option key={date} value={date}>
+              {date}
+            </Select.Option>
+          ))}
+        </Select>
+      </Space>
     </div>
-  );
-};
+  )
+}
 
-export default DateSelector;
+export default DateSelector

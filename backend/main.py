@@ -12,7 +12,7 @@ import os
 import json
 from typing import Optional, List
 import re
-from database import init_db, save_positions, save_applications, get_positions_with_stats, get_regional_stats, get_wuhan_district_stats, get_db_connection
+from database import init_db, save_positions, save_applications, get_positions_with_stats, get_regional_stats, get_wuhan_district_stats, get_db_connection, get_positions_by_codes as db_get_positions_by_codes
 
 # 初始化数据库
 init_db()
@@ -471,51 +471,47 @@ async def get_wuhan_positions(
 
 @app.post("/positions/by-codes")
 async def get_positions_by_codes(codes: List[str]):
-    """根据职位代码列表查询职位详情"""
-    if not os.path.exists(POSITION_FILE):
-        return {"data": [], "message": "请先上传职位表"}
-    
+    """根据职位代码列表查询职位详情 (从数据库查询)"""
     # 去重
     unique_codes = list(set(codes))
+    if not unique_codes:
+        return {"data": [], "total": 0, "not_found": [], "latest_date": None}
     
-    df = pd.read_excel(POSITION_FILE, dtype={'职位代码': str})
-    
-    # 加载最新报名数据
-    daily_files = sorted(os.listdir(DAILY_DIR)) if os.path.exists(DAILY_DIR) else []
-    if daily_files:
-        latest_file = daily_files[-1]
-        daily_df = pd.read_excel(os.path.join(DAILY_DIR, latest_file), dtype={'职位代码': str})
-        if '职位代码' in df.columns and '职位代码' in daily_df.columns:
-            df['职位代码'] = df['职位代码'].astype(str)
-            daily_df['职位代码'] = daily_df['职位代码'].astype(str)
-            df = df.merge(daily_df[['职位代码', '报名人数']], on='职位代码', how='left')
-            df['报名人数'] = df['报名人数'].fillna(0)
-    else:
-        df['报名人数'] = 0
-    
-    # 筛选指定的职位代码
-    df['职位代码'] = df['职位代码'].astype(str)
-    filtered = df[df['职位代码'].isin(unique_codes)].copy()
-    
-    # 计算竞争比
-    if '招录人数' in filtered.columns:
-        filtered['竞争比'] = (filtered['报名人数'] / filtered['招录人数'].replace(0, 1)).round(1)
-    else:
-        filtered['竞争比'] = 0
-    
-    # 按报名人数排序
-    filtered = filtered.sort_values('报名人数', ascending=False)
-    
-    # 找出未找到的职位代码
-    found_codes = set(filtered['职位代码'].tolist())
-    not_found = [c for c in unique_codes if c not in found_codes]
-    
-    return {
-        "data": filtered.fillna("").to_dict(orient='records'),
-        "total": len(filtered),
-        "not_found": not_found,
-        "latest_date": daily_files[-1].replace('.xlsx', '') if daily_files else None
-    }
+    try:
+        df, total, actual_date = db_get_positions_by_codes(unique_codes)
+        
+        # 兼容前端字段名
+        result_df = df.rename(columns={
+            'code': '职位代码',
+            'name': '职位名称',
+            'org': '招录机关',
+            'unit': '用人单位',
+            'quota': '招录人数',
+            'city': '城市',
+            'education': '学历',
+            'degree': '学位',
+            'major_pg': '研究生专业',
+            'major_ug': '本科专业',
+            'target': '招录对象',
+            'notes': '备注',
+            'intro': '职位简介',
+            'applicants': '报名人数',
+            'passed': '审核通过人数',
+            'competition_ratio': '竞争比'
+        })
+        
+        # 找出未找到的职位代码
+        found_codes = set(df['code'].tolist())
+        not_found = [c for c in unique_codes if c not in found_codes]
+        
+        return {
+            "data": result_df.fillna("").to_dict(orient='records'),
+            "total": total,
+            "not_found": not_found,
+            "latest_date": actual_date
+        }
+    except Exception as e:
+        return {"data": [], "total": 0, "not_found": unique_codes, "message": f"查询失败: {str(e)}"}
 
 
 @app.post("/positions/trend-by-codes")

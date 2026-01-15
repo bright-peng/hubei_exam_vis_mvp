@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Card, Grid, Statistic, Space, Typography, Empty, Button, Spin, Tag, Badge } from '@arco-design/web-react'
+import { IconFire, IconThunderbolt, IconMoon, IconHome, IconCalendar } from '@arco-design/web-react/icon'
 import * as echarts from 'echarts'
 import { getSummary, getHotPositions, getColdPositions, getTrend, getSurgePositions } from '../api'
 import DateSelector from '../components/DateSelector'
 import './Dashboard.css'
+
+const { Row, Col } = Grid
+const { Title, Text } = Typography
 
 export default function Dashboard() {
   const [summary, setSummary] = useState(null)
@@ -11,6 +16,7 @@ export default function Dashboard() {
   const [surgePositions, setSurgePositions] = useState([])
   const [selectedDate, setSelectedDate] = useState('')
   const [loading, setLoading] = useState(true)
+  const chartRef = useRef(null)
 
   useEffect(() => {
     loadData()
@@ -25,8 +31,6 @@ export default function Dashboard() {
         getColdPositions(10, selectedDate),
       ]
       
-      // Only fetch surge data if looking at latest date (empty selectedDate)
-      // or if we want to show it anyway (it's static latest surge)
       if (!selectedDate) {
         promises.push(getSurgePositions())
       }
@@ -40,7 +44,7 @@ export default function Dashboard() {
       setSummary(summaryData)
       setHotPositions(hotData.data || [])
       setColdPositions(coldData.data || [])
-      setSurgePositions(surgeData.data?.slice(0, 10) || []) // Top 10
+      setSurgePositions(surgeData.data?.slice(0, 10) || []) 
     } catch (error) {
       console.error('加载数据失败:', error)
     } finally {
@@ -48,25 +52,27 @@ export default function Dashboard() {
     }
   }
 
-  // 渲染迷你趋势图
   useEffect(() => {
-    if (!summary?.daily_files?.length) return
+    if (!summary?.daily_files?.length || loading) return
 
-    getTrend().then((trendData) => {
-      const chartDom = document.getElementById('mini-trend-chart')
-      if (!chartDom) return
+    let chart = null
 
-      const chart = echarts.init(chartDom)
+    const initChart = async () => {
+      const trendData = await getTrend()
+      if (!chartRef.current) return
+      
+      // Dispose old instance if exists
+      const existingInstance = echarts.getInstanceByDom(chartRef.current)
+      if (existingInstance) {
+        existingInstance.dispose()
+      }
+
+      chart = echarts.init(chartRef.current)
       const data = Array.isArray(trendData?.data) ? trendData.data : []
 
       chart.setOption({
         backgroundColor: 'transparent',
-        grid: {
-          left: 40,
-          right: 20,
-          top: 20,
-          bottom: 30,
-        },
+        grid: { left: 40, right: 20, top: 20, bottom: 30 },
         tooltip: {
           trigger: 'axis',
           backgroundColor: 'rgba(26, 26, 46, 0.9)',
@@ -99,11 +105,7 @@ export default function Dashboard() {
               ]),
               width: 3,
             },
-            itemStyle: {
-              color: '#667eea',
-              borderColor: '#fff',
-              borderWidth: 2,
-            },
+            itemStyle: { color: '#667eea', borderColor: '#fff', borderWidth: 2 },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
@@ -114,179 +116,149 @@ export default function Dashboard() {
         ],
       })
 
-      const handleResize = () => chart.resize()
-      window.addEventListener('resize', handleResize)
-      return () => {
-        window.removeEventListener('resize', handleResize)
+      window.addEventListener('resize', () => chart && chart.resize())
+    }
+
+    initChart()
+
+    return () => {
+      if (chart) {
+        window.removeEventListener('resize', () => chart && chart.resize())
         chart.dispose()
       }
-    })
-  }, [summary])
+    }
+  }, [summary, loading])
 
-  if (loading) {
-    return (
-      <div className="loading">
-        <div className="loading-spinner"></div>
-      </div>
-    )
+  if (loading && !summary) {
+    return <div style={{ display: 'flex', justifyContent: 'center', padding: 100 }}><Spin size={40} /></div>
   }
 
   if (!summary?.total_positions) {
     return (
-      <div className="dashboard">
-        <div className="empty-state glass-card">
-          <div className="empty-icon">📁</div>
-          <h2>暂无数据</h2>
-          <p>请先上传职位表和报名数据</p>
-          <a href="/upload" className="btn btn-primary">
-            去上传数据
-          </a>
-        </div>
+      <div className="dashboard-empty-container">
+        <Card bordered={false} className="glass-card-arco" style={{ textAlign: 'center', padding: '60px 0' }}>
+          <Empty icon={<IconHome style={{ fontSize: 60, color: 'var(--primary-color)' }} />} description="暂无数据，请先上传数据" />
+          <Button type="primary" style={{ marginTop: 24 }} onClick={() => window.location.href='/upload'}>去上传</Button>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="dashboard fade-in">
-      <div className="dashboard-header">
-        <h2 className="section-title">📊 招录概况</h2>
-        <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
-      </div>
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
-          <div className="stat-value">{summary.total_positions?.toLocaleString()}</div>
-          <div className="stat-label">招录职位数</div>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-value">{summary.total_quota?.toLocaleString()}</div>
-          <div className="stat-label">计划招录人数</div>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-value">{summary.total_applicants?.toLocaleString()}</div>
-          <div className="stat-label">报名人数</div>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-value">
-            {summary.total_quota > 0
-              ? (summary.total_applicants / summary.total_quota).toFixed(1)
-              : '0'}
-            <span className="stat-unit">:1</span>
-          </div>
-          <div className="stat-label">平均竞争比</div>
-        </div>
-      </div>
+    <div className="dashboard-arco fade-in">
+      <Row justify="space-between" align="center" style={{ marginBottom: 24 }} gutter={[0, 16]}>
+        <Col xs={24} sm={12}>
+          <Title heading={4} style={{ margin: 0 }}>📊 招录概况</Title>
+        </Col>
+        <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
+          <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
+        </Col>
+      </Row>
 
-      {/* 趋势图 */}
+      <Row gutter={[24, 24]}>
+        <Col xs={12} sm={12} md={6}>
+          <Card bordered={false} className="glass-card-arco stat-card-arco">
+            <Statistic title="招录职位" value={summary.total_positions} groupSeparator />
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6}>
+          <Card bordered={false} className="glass-card-arco stat-card-arco">
+            <Statistic title="计划招录" value={summary.total_quota} groupSeparator />
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6}>
+          <Card bordered={false} className="glass-card-arco stat-card-arco">
+            <Statistic title="当前报名" value={summary.total_applicants} groupSeparator />
+          </Card>
+        </Col>
+        <Col xs={12} sm={12} md={6}>
+          <Card bordered={false} className="glass-card-arco stat-card-arco">
+            <Statistic 
+              title="平均竞争比" 
+              value={summary.total_quota > 0 ? (summary.total_applicants / summary.total_quota).toFixed(1) : '0'} 
+              suffix=":1"
+            />
+          </Card>
+        </Col>
+      </Row>
+
       {summary.daily_files?.length > 0 && (
-        <div className="glass-card trend-section">
-          <h3 className="section-title">报名趋势</h3>
-          <div id="mini-trend-chart" className="mini-chart"></div>
-        </div>
+        <Card title="报名趋势" bordered={false} className="glass-card-arco" style={{ marginTop: 24 }}>
+          <div ref={chartRef} style={{ height: 260 }}></div>
+        </Card>
       )}
 
-      {/* 热门/冷门岗位 */}
-      <div className="positions-grid">
-        {/* 只有在没有选择日期（即看最新）时才显示激增榜 */}
+      <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
         {!selectedDate && (
-          <div className="glass-card">
-            <h3 className="section-title">
-              <span className="surge-icon">🚀</span>
-              报名激增 Top 10
-            </h3>
-            <div className="position-list">
-              {surgePositions.length === 0 ? (
-                <div className="empty-list">暂无数据</div>
-              ) : (
-                surgePositions.map((pos, idx) => (
-                  <div key={pos.code || idx} className="position-item">
-                    <div className="position-rank surge">{idx + 1}</div>
-                    <div className="position-info">
-                      <div className="position-code">{pos.code}</div>
-                      <div className="position-name" title={pos.name || pos.unit}>{pos.name || pos.unit}</div>
-                      <div className="position-meta">
-                        {pos.unit || ''} · {pos.city || ''}
-                      </div>
-                    </div>
-                    <div className="position-stats">
-                      <div className="applicants surge-text">+{pos.delta?.toLocaleString() || 0}</div>
-                      <div className="competition">
-                        总{pos.applicants_today?.toLocaleString() || 0}
-                      </div>
-                    </div>
+          <Col xs={24} md={8}>
+            <Card title={<Space><IconThunderbolt style={{ color: '#f77234' }} />报名激增 Top 10</Space>} bordered={false} className="glass-card-arco list-card-arco">
+              {surgePositions.map((pos, idx) => (
+                <div key={idx} className="rank-item-arco">
+                  <div className={`rank-number-arco rank-${idx + 1}`}>{idx + 1}</div>
+                  <div className="rank-main-arco">
+                    <Text bold ellipsis style={{ width: '100%' }}>{pos.name || pos.unit}</Text>
+                    <Space size={4} style={{ display: 'flex' }}>
+                       <Text className="dashboard-code-arco">{pos.code}</Text>
+                       <span style={{ color: 'var(--text-muted)' }}>·</span>
+                       <Text type="secondary" size="small" ellipsis>{pos.unit}</Text>
+                    </Space>
                   </div>
-                ))
-              )}
-            </div>
-          </div>
+                  <div className="rank-extra-arco">
+                    <Text bold style={{ color: '#f77234' }}>+{pos.delta}</Text>
+                    <Text size="tiny" type="secondary">总 {pos.applicants_today}</Text>
+                  </div>
+                </div>
+              ))}
+            </Card>
+          </Col>
         )}
-
-        <div className="glass-card">
-          <h3 className="section-title">
-            <span className="hot-icon">🔥</span>
-            热门岗位 Top 10
-          </h3>
-          <div className="position-list">
-            {hotPositions.length === 0 ? (
-              <div className="empty-list">暂无数据</div>
-            ) : (
-              hotPositions.map((pos, idx) => (
-                <div key={pos.职位代码 || idx} className="position-item">
-                  <div className="position-rank hot">{idx + 1}</div>
-                  <div className="position-info">
-                    <div className="position-code">{pos.职位代码}</div>
-                    <div className="position-name" title={pos.职位名称 || pos.招录机关}>{pos.职位名称 || pos.招录机关}</div>
-                    <div className="position-meta">
-                      {pos.用人单位 || ''} · {pos.工作地点 || ''}
-                    </div>
-                  </div>
-                  <div className="position-stats">
-                    <div className="applicants">{pos.报名人数?.toLocaleString() || 0}</div>
-                    <div className="competition">
-                      {pos.竞争比?.toFixed(1) || 0}:1
-                    </div>
-                  </div>
+        <Col xs={24} md={selectedDate ? 12 : 8}>
+          <Card title={<Space><IconFire style={{ color: '#f53f3f' }} />热门岗位 Top 10</Space>} bordered={false} className="glass-card-arco list-card-arco">
+            {hotPositions.map((pos, idx) => (
+              <div key={idx} className="rank-item-arco">
+                <div className={`rank-number-arco rank-${idx + 1}`}>{idx + 1}</div>
+                <div className="rank-main-arco">
+                  <Text bold ellipsis style={{ width: '100%' }}>{pos.职位名称 || pos.招录机关}</Text>
+                  <Space size={4} style={{ display: 'flex' }}>
+                    <Text style={{ fontSize: '10px', color: '#fbbf24', fontFamily: 'monospace' }}>{pos.职位代码}</Text>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>·</span>
+                    <Text type="secondary" size="small" ellipsis>{pos.用人单位}</Text>
+                  </Space>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="glass-card">
-          <h3 className="section-title">
-            <span className="cold-icon">❄️</span>
-            冷门岗位 Top 10
-          </h3>
-          <div className="position-list">
-            {coldPositions.length === 0 ? (
-              <div className="empty-list">暂无数据</div>
-            ) : (
-              coldPositions.map((pos, idx) => (
-                <div key={pos.职位代码 || idx} className="position-item">
-                  <div className="position-rank cold">{idx + 1}</div>
-                  <div className="position-info">
-                    <div className="position-code">{pos.职位代码}</div>
-                    <div className="position-name" title={pos.职位名称 || pos.招录机关}>{pos.职位名称 || pos.招录机关}</div>
-                    <div className="position-meta">
-                      {pos.用人单位 || ''} · {pos.工作地点 || ''}
-                    </div>
-                  </div>
-                  <div className="position-stats">
-                    <div className="applicants">{pos.报名人数?.toLocaleString() || 0}</div>
-                    <div className="competition cold-text">
-                      {pos.招录人数 || 1}人
-                    </div>
-                  </div>
+                <div className="rank-extra-arco">
+                  <Text bold>{pos.报名人数}</Text>
+                  <Tag color="red" size="small">{pos.竞争比?.toFixed(1)}:1</Tag>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
+              </div>
+            ))}
+          </Card>
+        </Col>
+        <Col xs={24} md={selectedDate ? 12 : 8}>
+          <Card title={<Space><IconMoon style={{ color: '#165dff' }} />冷门岗位 Top 10</Space>} bordered={false} className="glass-card-arco list-card-arco">
+            {coldPositions.map((pos, idx) => (
+              <div key={idx} className="rank-item-arco">
+                <div className={`rank-number-arco rank-${idx + 1}`}>{idx + 1}</div>
+                <div className="rank-main-arco">
+                  <Text bold ellipsis style={{ width: '100%' }}>{pos.职位名称 || pos.招录机关}</Text>
+                  <Space size={4} style={{ display: 'flex' }}>
+                    <Text style={{ fontSize: '10px', color: '#fbbf24', fontFamily: 'monospace' }}>{pos.职位代码}</Text>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>·</span>
+                    <Text type="secondary" size="small" ellipsis>{pos.用人单位}</Text>
+                  </Space>
+                </div>
+                <div className="rank-extra-arco">
+                  <Text bold>{pos.报名人数}</Text>
+                  <Text type="secondary" size="small">招{pos.招录人数}</Text>
+                </div>
+              </div>
+            ))}
+          </Card>
+        </Col>
+      </Row>
 
-      {/* 更新时间 */}
       {summary.latest_date && (
-        <div className="update-info">
-          数据更新时间: {summary.latest_date}
+        <div className="update-time-arco">
+          <IconCalendar /> 数据更新时间: {summary.latest_date}
         </div>
       )}
     </div>

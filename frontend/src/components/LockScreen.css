@@ -1,4 +1,6 @@
-.lock-screen {
+/* LockScreen 样式 - 适配 Arco Design */
+
+.lock-screen-arco {
   position: fixed;
   top: 0;
   left: 0;
@@ -11,7 +13,7 @@
   z-index: 9999;
 }
 
-.lock-screen::before {
+.lock-screen-arco::before {
   content: '';
   position: absolute;
   top: 0;
@@ -24,62 +26,15 @@
   pointer-events: none;
 }
 
-.lock-card {
+.lock-card-arco {
   width: 100%;
-  max-width: 400px;
-  text-align: center;
-  padding: 40px;
-  backdrop-filter: blur(30px) !important;
+  max-width: 420px;
+  padding: 24px;
 }
 
-.lock-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
-}
-
-.lock-card h2 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  color: var(--text-primary);
-}
-
-.lock-card p {
-  color: var(--text-secondary);
-  margin-bottom: 30px;
-}
-
-.lock-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.password-input {
-  text-align: center;
-  font-size: 1.2rem;
-  letter-spacing: 4px;
-}
-
-.input-error {
-  border-color: var(--danger-color) !important;
-  animation: shake 0.4s ease-in-out;
-}
-
-.error-msg {
-  color: var(--danger-color);
-  font-size: 0.875rem;
-  margin-top: -10px;
-}
-
-.unlock-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+.lock-icon-arco {
+  display: inline-flex;
+  padding: 20px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 50%;
 }

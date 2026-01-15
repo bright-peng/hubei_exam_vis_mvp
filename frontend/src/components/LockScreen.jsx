@@ -1,51 +1,57 @@
-import React, { useState } from 'react';
-import './LockScreen.css';
+import React, { useState } from 'react'
+import { Card, Input, Button, Typography, Space, Message, Alert } from '@arco-design/web-react'
+import { IconLock } from '@arco-design/web-react/icon'
+import './LockScreen.css'
 
-// 简单的密码配置（注意：这是前端硬编码，不够安全，仅防普通用户）
-// 也可以配置为环境变量 import.meta.env.VITE_APP_PASSWORD
-// 简单的密码配置（注意：这是前端硬编码，不够安全，仅防普通用户）
-const VALID_PASSWORDS = ['whu', '888', '666']; 
+const { Title, Text } = Typography
+
+const VALID_PASSWORDS = ['whu', '888', '666']
 
 export default function LockScreen({ onUnlock }) {
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(false)
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     if (VALID_PASSWORDS.includes(password)) {
-      onUnlock();
+      onUnlock()
+      Message.success('欢迎回来')
     } else {
-      setError(true);
-      setPassword('');
+      setError(true)
+      setPassword('')
     }
-  };
+  }
 
   return (
-    <div className="lock-screen">
-      <div className="lock-card glass-card">
-        <div className="lock-icon">🔒</div>
-        <h2>访问受限</h2>
-        <p>请输入访问密码以查看数据</p>
+    <div className="lock-screen-arco">
+      <Card bordered={false} className="glass-card-arco lock-card-arco">
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div className="lock-icon-arco">
+            <IconLock style={{ fontSize: 40, color: 'var(--primary-color)' }} />
+          </div>
+          <Title heading={4} style={{ marginTop: 16, marginBottom: 8 }}>访问受限</Title>
+          <Text type="secondary">请输入访问密码以进入系统</Text>
+        </div>
         
-        <form onSubmit={handleSubmit} className="lock-form">
-          <input
-            type="password"
-            className={`input password-input ${error ? 'input-error' : ''}`}
-            placeholder="请输入密码"
+        <Space direction="vertical" style={{ width: '100%' }} size={16}>
+          <Input.Password
+            placeholder="请输入访问密码"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError(false);
+            onChange={(val) => {
+              setPassword(val)
+              setError(false)
             }}
+            onPressEnter={handleSubmit}
+            size="large"
             autoFocus
           />
-          {error && <div className="error-msg">密码错误，请重试</div>}
           
-          <button type="submit" className="btn btn-primary unlock-btn">
+          {error && <Alert type="error" content="密码错误，请重试" showIcon={false} />}
+          
+          <Button type="primary" size="large" long onClick={handleSubmit}>
             解锁进入
-          </button>
-        </form>
-      </div>
+          </Button>
+        </Space>
+      </Card>
     </div>
-  );
+  )
 }

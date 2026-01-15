@@ -1,8 +1,27 @@
 import React, { useState, useEffect } from 'react'
+import { 
+  Table, 
+  Card, 
+  Form, 
+  Input, 
+  Select, 
+  Button, 
+  Space, 
+  Tag, 
+  Badge, 
+  Grid,
+  Pagination,
+  Typography,
+  Tooltip
+} from '@arco-design/web-react'
+import { IconSearch, IconRefresh, IconEye } from '@arco-design/web-react/icon'
 import { getPositions, getFilters } from '../api'
 import PositionDetailModal from '../components/PositionDetailModal'
 import DateSelector from '../components/DateSelector'
 import './PositionList.css'
+
+const { Row, Col } = Grid
+const { Title, Text } = Typography
 
 export default function PositionList() {
   const [positions, setPositions] = useState([])
@@ -13,11 +32,13 @@ export default function PositionList() {
   
   // 筛选条件
   const [selectedCity, setSelectedCity] = useState('武汉市')
-  const [selectedEducation, setSelectedEducation] = useState('')
+  const [selectedEducation, setSelectedEducation] = useState(undefined)
   const [selectedDate, setSelectedDate] = useState('')
   const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
   const pageSize = 20
+
+  const [form] = Form.useForm()
 
   useEffect(() => {
     loadFilters()
@@ -25,6 +46,7 @@ export default function PositionList() {
 
   useEffect(() => {
     loadPositions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, selectedCity, selectedEducation, selectedDate])
 
   const loadFilters = async () => {
@@ -64,188 +86,202 @@ export default function PositionList() {
   }
 
   const handleReset = () => {
+    form.resetFields()
     setSelectedCity('武汉市')
-    setSelectedEducation('')
+    setSelectedEducation(undefined)
     setSelectedDate('')
     setKeyword('')
     setPage(1)
   }
 
-  const handleShowDetail = (pos) => {
-    setSelectedPosition(pos)
-  }
-
-  const totalPages = Math.ceil(total / pageSize)
+  const columns = [
+    {
+      title: '职位代码',
+      dataIndex: '职位代码',
+      width: 120,
+      render: (val) => <Text copyable className="code-text">{val}</Text>
+    },
+    {
+      title: '用人单位',
+      dataIndex: '用人单位',
+      ellipsis: true,
+      render: (val) => <Tooltip content={val}>{val}</Tooltip>
+    },
+    {
+      title: '职位名称',
+      dataIndex: '职位名称',
+      ellipsis: true,
+      render: (val) => <Tooltip content={val}>{val}</Tooltip>
+    },
+    {
+      title: '招录',
+      dataIndex: '招录人数',
+      width: 80,
+      align: 'center'
+    },
+    {
+      title: '报名',
+      dataIndex: '报名人数',
+      width: 100,
+      align: 'center',
+      render: (val, record) => {
+        const isHot = record.招录人数 > 0 && (val / record.招录人数) > 50
+        const isCold = val === 0
+        return (
+          <Text bold style={{ color: isHot ? '#ff4d4f' : isCold ? '#999' : 'inherit' }}>
+            {val || 0}
+          </Text>
+        )
+      }
+    },
+    {
+      title: '竞争比',
+      width: 100,
+      align: 'center',
+      render: (_, record) => {
+        const competition = record.招录人数 > 0
+          ? (record.报名人数 / record.招录人数).toFixed(1)
+          : 0
+        const isHot = competition > 50
+        const isCold = record.报名人数 === 0
+        let status = 'success'
+        if (isHot) status = 'error'
+        if (isCold) status = 'default'
+        
+        return <Badge status={status} text={`${competition}:1`} />
+      }
+    },
+    {
+      title: '研究生专业',
+      dataIndex: '研究生专业',
+      ellipsis: true,
+      render: (val) => <Tooltip content={val || '不限'}>{val || '不限'}</Tooltip>
+    },
+    {
+      title: '本科专业',
+      dataIndex: '本科专业',
+      ellipsis: true,
+      render: (val) => <Tooltip content={val || '不限'}>{val || '不限'}</Tooltip>
+    },
+    {
+      title: '招录对象',
+      dataIndex: '招录对象',
+      width: 120,
+      ellipsis: true,
+      render: (val) => <Tooltip content={val || '不限'}>{val || '不限'}</Tooltip>
+    },
+    {
+      title: '操作',
+      width: 100,
+      render: (_, record) => (
+        <Button 
+          type="text" 
+          size="mini" 
+          icon={<IconEye />} 
+          onClick={() => setSelectedPosition(record)}
+        >
+          详情
+        </Button>
+      )
+    }
+  ]
 
   return (
-    <div className="position-list fade-in">
+    <div className="position-list-arco fade-in">
       {/* 筛选区域 */}
-      <div className="glass-card filter-section">
-        <div className="filter-header">
-          <h3 className="section-title">职位筛选</h3>
-          <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
+      <Card className="glass-card-arco filter-card-arco" bordered={false}>
+        <Row justify="space-between" align="center" style={{ marginBottom: 24 }} gutter={[0, 16]}>
+          <Col xs={24} sm={12}>
+            <Title heading={5} style={{ margin: 0 }}>
+              <Space><IconSearch /> 职位筛选</Space>
+            </Title>
+          </Col>
+          <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
+            <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
+          </Col>
+        </Row>
+        
+        <Form
+          form={form}
+          layout="vertical"
+          onValuesChange={(changed) => {
+            if (changed.city !== undefined) setSelectedCity(changed.city)
+            if (changed.education !== undefined) setSelectedEducation(changed.education)
+            if (changed.keyword !== undefined) setKeyword(changed.keyword)
+          }}
+          initialValues={{ city: '武汉市', education: undefined, keyword: '' }}
+        >
+          <Row gutter={[24, 0]} align="end">
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item label="工作地点" field="city">
+                <Select placeholder="选择地区" allowClear>
+                  {filters.cities?.map((city) => (
+                    <Select.Option key={city} value={city}>{city}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item label="学历要求" field="education">
+                <Select placeholder="选择学历" allowClear>
+                  {filters.education?.map((edu) => (
+                    <Select.Option key={edu} value={edu}>{edu}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={16} md={8}>
+              <Form.Item label="关键词搜索" field="keyword">
+                <Input 
+                  placeholder="搜索职位、机关、简介、专业..." 
+                  allowClear 
+                  onPressEnter={handleSearch}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8} md={4}>
+              <Form.Item>
+                <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                  <Button type="primary" icon={<IconSearch />} onClick={handleSearch} style={{ flex: 1 }}>搜索</Button>
+                  <Button icon={<IconRefresh />} onClick={handleReset}>重置</Button>
+                </Space>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+
+      {/* 数据内容 */}
+      <Card className="glass-card-arco content-card-arco" bordered={false} style={{ marginTop: 20 }}>
+        <div style={{ marginBottom: 16 }}>
+          <Text>共找到 <Text bold color="arcoblue">{total.toLocaleString()}</Text> 个职位</Text>
         </div>
-        <div className="filter-grid">
-          <div className="filter-item">
-            <label>工作地点</label>
-            <select
-              className="select"
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-            >
-              <option value="">全部地区</option>
-              {filters.cities?.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-item">
-            <label>学历要求</label>
-            <select
-              className="select"
-              value={selectedEducation}
-              onChange={(e) => setSelectedEducation(e.target.value)}
-            >
-              <option value="">全部学历</option>
-              {filters.education?.map((edu) => (
-                <option key={edu} value={edu}>
-                  {edu}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-item keyword-filter">
-            <label>关键词搜索</label>
-            <input
-              type="text"
-              className="input"
-              placeholder="搜索职位、机关、简介、专业..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            />
-          </div>
-
-          <div className="filter-actions">
-            <button className="btn btn-primary" onClick={handleSearch}>
-              🔍 搜索
-            </button>
-            <button className="btn btn-secondary" onClick={handleReset}>
-              重置
-            </button>
-          </div>
+        
+        <Table
+          loading={loading}
+          columns={columns}
+          data={positions}
+          pagination={false}
+          rowKey="职位代码"
+          scroll={{ x: 1200 }}
+          noDataElement={
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <Text type="secondary">没有找到符合条件的职位</Text>
+            </div>
+          }
+        />
+        
+        <div className="pagination-wrapper-arco">
+          <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={total}
+            onChange={(p) => setPage(p)}
+            showTotal
+            size="medium"
+          />
         </div>
-      </div>
-
-      {/* 结果统计 */}
-      <div className="result-info">
-        <span>
-          共找到 <strong>{total.toLocaleString()}</strong> 个职位
-        </span>
-        {(selectedCity || selectedEducation || keyword) && (
-          <span className="filter-tags">
-            {selectedCity && <span className="tag">{selectedCity}</span>}
-            {selectedEducation && <span className="tag">{selectedEducation}</span>}
-            {keyword && <span className="tag">"{keyword}"</span>}
-          </span>
-        )}
-      </div>
-
-      {/* 职位表格 */}
-      <div className="glass-card">
-        {loading ? (
-          <div className="loading">
-            <div className="loading-spinner"></div>
-          </div>
-        ) : positions.length === 0 ? (
-          <div className="empty-list">
-            <p>没有找到符合条件的职位</p>
-            {!total && <p className="hint">请先上传职位表</p>}
-          </div>
-        ) : (
-          <>
-            <div className="table-container">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>职位代码</th>
-                    <th>用人单位</th>
-                    <th>职位名称</th>
-                    <th>招录人数</th>
-                    <th>报名人数</th>
-                    <th>竞争比</th>
-                    <th>研究生专业</th>
-                    <th>本科专业</th>
-                    <th>招录对象</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(Array.isArray(positions) ? positions : []).map((pos) => {
-                    const competition = pos.招录人数 > 0
-                      ? (pos.报名人数 / pos.招录人数).toFixed(1)
-                      : 0
-                    const isHot = competition > 50
-                    const isCold = pos.报名人数 === 0
-
-                    return (
-                      <tr key={pos.职位代码}>
-                        <td className="code">{pos.职位代码}</td>
-                        <td className="org" title={pos.用人单位}>{pos.用人单位}</td>
-                        <td className="name" title={pos.职位名称}>{pos.职位名称}</td>
-                        <td className="center">{pos.招录人数}</td>
-                        <td className="center">
-                          <span className={isHot ? 'hot-value' : isCold ? 'cold-value' : ''}>
-                            {pos.报名人数 || 0}
-                          </span>
-                        </td>
-                        <td className="center">
-                          <span className={`badge ${isHot ? 'badge-hot' : isCold ? 'badge-cold' : 'badge-normal'}`}>
-                            {competition}:1
-                          </span>
-                        </td>
-                        <td className="major" title={pos.研究生专业}>{pos.研究生专业 || '不限'}</td>
-                        <td className="major" title={pos.本科专业}>{pos.本科专业 || '不限'}</td>
-                        <td className="tags" title={pos.招录对象}>{pos.招录对象 || '不限'}</td>
-                        <td className="actions">
-                          <button className="btn-detail" onClick={() => handleShowDetail(pos)}>
-                            详情
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* 分页 */}
-            <div className="pagination">
-              <button
-                className="btn btn-secondary"
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
-              >
-                上一页
-              </button>
-              <span className="page-info">
-                第 {page} 页 / 共 {totalPages} 页
-              </span>
-              <button
-                className="btn btn-secondary"
-                disabled={page >= totalPages}
-                onClick={() => setPage(page + 1)}
-              >
-                下一页
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+      </Card>
 
       <PositionDetailModal 
         position={selectedPosition} 

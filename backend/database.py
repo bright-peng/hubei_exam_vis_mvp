@@ -211,3 +211,34 @@ def get_wuhan_district_stats(date=None):
     df = pd.read_sql_query(query, conn, params=[date])
     conn.close()
     return df, date
+
+def get_positions_by_codes(codes, date=None):
+    """Query specific positions by codes with latest stats"""
+    if not codes:
+        return pd.DataFrame(), 0, None
+        
+    conn = get_db_connection()
+    
+    if not date:
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(date) FROM applications")
+        date = cursor.fetchone()[0]
+        
+    placeholders = ','.join(['?'] * len(codes))
+    query = f"""
+    SELECT p.*, 
+           COALESCE(a.applicants, 0) as applicants, 
+           COALESCE(a.passed, 0) as passed,
+           ROUND(CAST(COALESCE(a.applicants, 0) AS FLOAT) / CASE WHEN p.quota = 0 THEN 1 ELSE p.quota END, 1) as competition_ratio
+    FROM positions p
+    LEFT JOIN applications a ON p.code = a.code AND a.date = ?
+    WHERE p.code IN ({placeholders})
+    ORDER BY applicants DESC
+    """
+    
+    params = [date] + [str(c) for c in codes]
+    df = pd.read_sql_query(query, conn, params=params)
+    conn.close()
+    
+    return df, len(df), date
+

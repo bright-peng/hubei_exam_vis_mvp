@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getPositionsByCodes, getTrendByCodes } from '../../api';
 import PositionDetailModal from '../../components/PositionDetailModal';
 import './WatchList.css';
 
-const API_BASE = 'http://localhost:8000';
+// Remove API_BASE definition as we will use imported functions
+// const API_BASE = 'http://localhost:8000'; deleted
+
 
 // 默认关注的职位代码列表
 const DEFAULT_WATCH_CODES = [
@@ -58,12 +61,7 @@ function WatchList() {
   const fetchPositions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/positions/by-codes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(watchCodes)
-      });
-      const data = await res.json();
+      const data = await getPositionsByCodes(watchCodes);
       setPositions(data.data || []);
       setNotFound(data.not_found || []);
       setLatestDate(data.latest_date || '');
@@ -77,12 +75,7 @@ function WatchList() {
   const fetchTrendData = async () => {
     setTrendLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/positions/trend-by-codes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(watchCodes)
-      });
-      const data = await res.json();
+      const data = await getTrendByCodes(watchCodes);
       setTrendData(data);
     } catch (err) {
       console.error('获取趋势数据失败:', err);

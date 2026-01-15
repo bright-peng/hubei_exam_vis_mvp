@@ -27,7 +27,7 @@ export default api
 let positionsPromiseCache = {}  // Optimized: Cache promises to handle concurrent requests
 let trendPromise = null         // Optimized: Cache promise for trend data
 
-const loadStaticPositions = (date = null) => {
+export const loadStaticPositions = (date = null) => {
     // If no date specified, use '' as key for default/latest
     const cacheKey = date || ''
 
@@ -118,6 +118,10 @@ const filterPositions = (data, params) => {
             safeStr(p[DATA_KEYS.NOTES]).includes(k)
         )
     }
+    if (params.codeList && params.codeList.length > 0) {
+        const codeSet = new Set(params.codeList.map(String))
+        result = result.filter(p => codeSet.has(String(p[DATA_KEYS.CODE])))
+    }
     return result
 }
 
@@ -139,6 +143,13 @@ export const uploadDaily = (file, date) => {
     return api.post(`/upload/daily?report_date=${date}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     })
+}
+
+// Cache for codeList requests to avoid re-fetching on pagination
+let codeListCache = {
+    key: null,
+    data: null,
+    latestDate: null
 }
 
 export const getPositions = async (params) => {
@@ -164,7 +175,55 @@ export const getPositions = async (params) => {
             date: params.date || "最新数据"
         }
     }
+
+    // Dynamic mode fix: If requesting specific codes, use the POST endpoint
+    // Cache result to avoid re-fetching on pagination
+    if (params.codeList && params.codeList.length > 0) {
+        // Generate cache key from sorted codeList
+        const cacheKey = [...params.codeList].sort().join(',')
+
+        let allData, latestDate
+
+        // Check cache
+        if (codeListCache.key === cacheKey && codeListCache.data) {
+            allData = codeListCache.data
+            latestDate = codeListCache.latestDate
+        } else {
+            // Fetch from backend and cache
+            const result = await api.post('/positions/by-codes', params.codeList)
+            allData = result.data || []
+            latestDate = result.latest_date
+
+            // Store in cache
+            codeListCache = {
+                key: cacheKey,
+                data: allData,
+                latestDate: latestDate
+            }
+        }
+
+        // Client-side pagination
+        const page = params.page || 1
+        const pageSize = params.page_size || 20
+        const start = (page - 1) * pageSize
+        const end = start + pageSize
+        const pageData = allData.slice(start, end)
+
+        return {
+            data: pageData,
+            total: allData.length,
+            page: page,
+            page_size: pageSize,
+            date: latestDate || "最新数据"
+        }
+    }
+
     return api.get('/positions', { params })
+}
+
+// Clear codeList cache (call this when navigating away from momentum filter)
+export const clearCodeListCache = () => {
+    codeListCache = { key: null, data: null, latestDate: null }
 }
 
 export const getStatsByRegion = async (date) => {

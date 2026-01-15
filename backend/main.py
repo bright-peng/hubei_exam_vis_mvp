@@ -807,6 +807,56 @@ async def get_filters():
     }
 
 
+@app.get("/stats/momentum")
+async def get_momentum():
+    """计算今日态势数据 - 需要至少两天的报名数据"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # 获取最近两天的日期
+    cursor.execute("SELECT DISTINCT date FROM applications ORDER BY date DESC LIMIT 2")
+    dates = [row[0] for row in cursor.fetchall()]
+    
+    if len(dates) < 2:
+        conn.close()
+        return {
+            "surge": {"count": 0, "ids": []},
+            "accelerating": {"count": 0, "ids": []},
+            "cooling": {"count": 0, "ids": []},
+            "message": "需要至少两天的数据才能计算态势"
+        }
+    
+    today, yesterday = dates[0], dates[1]
+    
+    # 获取今天和昨天的报名数据
+    query = """
+    SELECT 
+        t.code,
+        t.applicants as today_app,
+        COALESCE(y.applicants, 0) as yesterday_app,
+        (t.applicants - COALESCE(y.applicants, 0)) as growth
+    FROM applications t
+    LEFT JOIN applications y ON t.code = y.code AND y.date = ?
+    WHERE t.date = ?
+    """
+    df = pd.read_sql_query(query, conn, params=[yesterday, today])
+    conn.close()
+    
+    SURGE_THRESHOLD = 50
+    
+    surge_ids = df[df['growth'] >= SURGE_THRESHOLD]['code'].tolist()
+    accelerating_ids = df[(df['yesterday_app'] < 20) & (df['growth'] > 5)]['code'].tolist()
+    cooling_ids = df[(df['yesterday_app'] > 100) & (df['growth'] < 2)]['code'].tolist()
+    
+    return {
+        "surge": {"count": len(surge_ids), "ids": surge_ids},
+        "accelerating": {"count": len(accelerating_ids), "ids": accelerating_ids},
+        "cooling": {"count": len(cooling_ids), "ids": cooling_ids},
+        "today": today,
+        "yesterday": yesterday
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

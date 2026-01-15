@@ -28,6 +28,101 @@
   background-clip: text;
 }
 
+/* 态势卡片 NEW */
+.momentum-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 0 0 24px 0;
+}
+
+.momentum-card {
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.momentum-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Fire Card */
+.momentum-card.fire {
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.1) 0%, rgba(255, 77, 79, 0.05) 100%);
+  border-color: rgba(255, 77, 79, 0.2);
+}
+.momentum-card.fire:hover {
+  box-shadow: 0 4px 20px rgba(255, 77, 79, 0.15);
+  border-color: rgba(255, 77, 79, 0.4);
+}
+.momentum-card.fire .m-value { color: #ff4d4f; }
+.momentum-card.fire .m-icon { background: rgba(255, 77, 79, 0.2); color: #ff4d4f; }
+
+/* Warning Card */
+.momentum-card.warning {
+  background: linear-gradient(135deg, rgba(255, 122, 69, 0.1) 0%, rgba(255, 122, 69, 0.05) 100%);
+  border-color: rgba(255, 122, 69, 0.2);
+}
+.momentum-card.warning:hover {
+  box-shadow: 0 4px 20px rgba(255, 122, 69, 0.15);
+  border-color: rgba(255, 122, 69, 0.4);
+}
+.momentum-card.warning .m-value { color: #ff7a45; }
+.momentum-card.warning .m-icon { background: rgba(255, 122, 69, 0.2); color: #ff7a45; }
+
+/* Safe/Cooling Card */
+.momentum-card.safe {
+  background: linear-gradient(135deg, rgba(82, 196, 26, 0.1) 0%, rgba(82, 196, 26, 0.05) 100%);
+  border-color: rgba(82, 196, 26, 0.2);
+}
+.momentum-card.safe:hover {
+  box-shadow: 0 4px 20px rgba(82, 196, 26, 0.15);
+  border-color: rgba(82, 196, 26, 0.4);
+}
+.momentum-card.safe .m-value { color: #52c41a; }
+.momentum-card.safe .m-icon { background: rgba(82, 196, 26, 0.2); color: #52c41a; }
+
+
+.m-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.m-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.m-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.m-value {
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'DIN Alternate', sans-serif;
+}
+
+.m-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
 /* 排行榜样式 */
 .list-card-arco .arco-card-header {
   border-bottom: 1px solid var(--glass-border);
@@ -55,6 +150,7 @@
   font-size: 12px;
   font-weight: bold;
   background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
 }
 
 .rank-1 { background: #ff4d4f; color: #fff; }
@@ -65,12 +161,16 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .rank-extra-arco {
   text-align: right;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .update-time-arco {
@@ -84,9 +184,215 @@
   gap: 8px;
 }
 
-/* 响应式 */
+/* 趋势分析栏 */
+.trend-analysis-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ====================== 响应式布局 ====================== */
+
+/* 平板端 (768px - 1024px) */
 @media (max-width: 1024px) {
-  .arco-col {
-    width: 100% !important;
+  .momentum-section {
+    gap: 12px;
+  }
+  
+  .momentum-card {
+    padding: 14px;
+  }
+  
+  .m-value {
+    font-size: 22px;
+  }
+}
+
+/* 手机端 (< 768px) */
+@media (max-width: 768px) {
+  .dashboard-arco {
+    padding: 0 4px;
+  }
+  
+  /* 态势卡片改为单列 */
+  .momentum-section {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .momentum-card {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+  }
+  
+  .m-header {
+    margin-bottom: 0;
+  }
+  
+  .m-value {
+    font-size: 20px;
+    margin: 0 12px;
+  }
+  
+  .m-desc {
+    display: none; /* 手机端隐藏描述，保持简洁 */
+  }
+  
+  /* 趋势图标题栏响应式 */
+  .glass-card-arco .arco-card-header-title {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+  
+  .glass-card-arco .arco-radio-group {
+    width: 100%;
+    display: flex;
+    justify-content: stretch;
+  }
+  
+  .glass-card-arco .arco-radio-group .arco-radio {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .glass-card-arco .arco-radio-group .arco-radio-button {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+  
+  /* 趋势分析栏 */
+  .trend-analysis-bar {
+    font-size: 12px;
+    padding: 6px 10px !important;
+  }
+  
+  /* 排行榜优化 */
+  .rank-item-arco {
+    padding: 10px 0;
+  }
+  
+  .rank-number-arco {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    margin-right: 10px;
+  }
+  
+  .rank-main-arco .arco-typography {
+    font-size: 13px !important;
+  }
+  
+  .rank-extra-arco {
+    font-size: 12px;
+  }
+  
+  /* 职位代码缩小 */
+  .dashboard-code-arco {
+    font-size: 9px !important;
+  }
+  
+  /* 统计卡片 */
+  .stat-card-arco {
+    padding: 10px;
+  }
+  
+  .stat-card-arco .arco-statistic-title {
+    font-size: 11px;
+  }
+  
+  .stat-card-arco .arco-statistic-value {
+    font-size: 18px !important;
+  }
+}
+
+/* 超小屏幕 (< 480px) */
+@media (max-width: 480px) {
+  .momentum-card {
+    padding: 10px 12px;
+  }
+  
+  .m-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+  
+  .m-title {
+    font-size: 12px;
+  }
+  
+  .m-value {
+    font-size: 18px;
+  }
+  
+  /* 时间选择器 */
+  .glass-card-arco .arco-radio-group .arco-radio-button {
+    padding: 3px 4px;
+    font-size: 10px;
+  }
+  
+  /* 排行榜项目更紧凑 */
+  .rank-item-arco {
+    padding: 8px 0;
+  }
+  
+  .rank-main-arco .arco-typography {
+    font-size: 12px !important;
+  }
+  
+  .stat-card-arco .arco-statistic-value {
+    font-size: 16px !important;
+  }
+}
+
+/* 趋势图时间切换器 */
+.trend-time-switcher {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.trend-time-switcher .arco-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.trend-time-switcher .arco-radio-button {
+  white-space: nowrap;
+}
+
+/* 手机端时间切换器 */
+@media (max-width: 768px) {
+  .trend-time-switcher {
+    justify-content: center;
+  }
+  
+  .trend-time-switcher .arco-radio-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .trend-time-switcher .arco-radio {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .trend-time-switcher .arco-radio-button {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trend-time-switcher .arco-radio-button {
+    padding: 5px 6px;
+    font-size: 11px;
   }
 }

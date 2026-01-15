@@ -159,6 +159,7 @@ export default function App() {
             <Route path="/watchlist" element={<WatchList />} />
             <Route path="/trend" element={<TrendView />} />
             <Route path="/positions" element={<PositionList />} />
+            <Route path="/list" element={<PositionList />} /> 
             <Route path="/upload" element={<DataUpload />} />
           </Routes>
         </div>

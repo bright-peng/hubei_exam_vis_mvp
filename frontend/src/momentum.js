@@ -26,11 +26,38 @@ export const getDailyMomentum = async (todayDate, yesterdayDate) => {
     // In STATIC/PROD mode, calculate from JSON files
     const runCalculation = async () => {
         try {
-            const todayUrl = import.meta.env.BASE_URL + (todayDate ? `data/positions_${todayDate}.json` : 'data/positions.json');
+            // If no yesterdayDate, try to get dates from summary
+            let todayUrl, yesterdayUrl, actualYesterday = yesterdayDate;
 
-            if (!yesterdayDate) throw new Error("No yesterday date provided");
+            if (!yesterdayDate) {
+                // Try to get available dates from summary.json
+                try {
+                    const summaryRes = await axios.get(import.meta.env.BASE_URL + 'data/summary.json');
+                    const dailyFiles = summaryRes.data?.daily_files || [];
+                    if (dailyFiles.length >= 2) {
+                        // daily_files is usually [oldest, ..., latest], so reverse for [latest, ..., oldest]
+                        const sortedDates = [...dailyFiles].sort().reverse();
+                        actualYesterday = sortedDates[1]; // Second latest
+                        if (!todayDate) {
+                            todayDate = sortedDates[0]; // Latest
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Could not get dates from summary", e);
+                }
+            }
 
-            const yesterdayUrl = import.meta.env.BASE_URL + `data/positions_${yesterdayDate}.json`;
+            if (!actualYesterday) {
+                console.warn("No yesterday date available for momentum calculation");
+                return {
+                    surge: { count: 0, ids: [] },
+                    accelerating: { count: 0, ids: [] },
+                    cooling: { count: 0, ids: [] }
+                };
+            }
+
+            todayUrl = import.meta.env.BASE_URL + (todayDate ? `data/positions_${todayDate}.json` : 'data/positions.json');
+            yesterdayUrl = import.meta.env.BASE_URL + `data/positions_${actualYesterday}.json`;
 
             const [todayRes, yesterdayRes] = await Promise.all([
                 axios.get(todayUrl),
@@ -85,3 +112,4 @@ export const getDailyMomentum = async (todayDate, yesterdayDate) => {
 
     return runCalculation();
 }
+

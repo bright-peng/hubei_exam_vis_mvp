@@ -19,6 +19,7 @@ import { getPositions, getFilters } from '../api'
 import PositionDetailModal from '../components/PositionDetailModal'
 import DateSelector from '../components/DateSelector'
 import './PositionList.css'
+import { DATA_KEYS } from '../constants'
 
 const { Row, Col } = Grid
 const { Title, Text } = Typography
@@ -100,13 +101,13 @@ export default function PositionList() {
   const columns = [
     {
       title: '职位代码',
-      dataIndex: '职位代码',
+      dataIndex: DATA_KEYS.CODE,
       width: 120,
       render: (val) => <Text copyable className="code-text">{val}</Text>
     },
     {
       title: '用人单位',
-      dataIndex: '用人单位',
+      dataIndex: DATA_KEYS.UNIT,
       ellipsis: true,
       render: (val) => (
         <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val}</div>} getPopupContainer={(node) => node.parentNode}>
@@ -116,7 +117,7 @@ export default function PositionList() {
     },
     {
       title: '职位名称',
-      dataIndex: '职位名称',
+      dataIndex: DATA_KEYS.NAME,
       ellipsis: true,
       render: (val) => (
         <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val}</div>} getPopupContainer={(node) => node.parentNode}>
@@ -126,17 +127,18 @@ export default function PositionList() {
     },
     {
       title: '招录',
-      dataIndex: '招录人数',
+      dataIndex: DATA_KEYS.QUOTA,
       width: 80,
       align: 'center'
     },
     {
       title: '报名',
-      dataIndex: '报名人数',
+      dataIndex: DATA_KEYS.APPLICANTS,
       width: 100,
       align: 'center',
       render: (val, record) => {
-        const isHot = record.招录人数 > 0 && (val / record.招录人数) > 50
+        const quota = record[DATA_KEYS.QUOTA]
+        const isHot = quota > 0 && (val / quota) > 50
         const isCold = val === 0
         return (
           <Text bold style={{ color: isHot ? '#ff4d4f' : isCold ? '#999' : 'inherit' }}>
@@ -150,11 +152,13 @@ export default function PositionList() {
       width: 100,
       align: 'center',
       render: (_, record) => {
-        const competition = record.招录人数 > 0
-          ? (record.报名人数 / record.招录人数).toFixed(1)
+        const quota = record[DATA_KEYS.QUOTA]
+        const applicants = record[DATA_KEYS.APPLICANTS]
+        const competition = quota > 0
+          ? (applicants / quota).toFixed(1)
           : 0
         const isHot = competition > 50
-        const isCold = record.报名人数 === 0
+        const isCold = applicants === 0
         let status = 'success'
         if (isHot) status = 'error'
         if (isCold) status = 'default'
@@ -164,7 +168,7 @@ export default function PositionList() {
     },
     {
       title: '研究生专业',
-      dataIndex: '研究生专业',
+      dataIndex: DATA_KEYS.MAJOR_PG,
       ellipsis: true,
       render: (val) => (
         <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val || '不限'}</div>} getPopupContainer={(node) => node.parentNode}>
@@ -174,7 +178,7 @@ export default function PositionList() {
     },
     {
       title: '本科专业',
-      dataIndex: '本科专业',
+      dataIndex: DATA_KEYS.MAJOR_UG,
       ellipsis: true,
       render: (val) => (
         <Tooltip position="tl" content={<div style={{ maxWidth: 300, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{val || '不限'}</div>} getPopupContainer={(node) => node.parentNode}>
@@ -184,7 +188,7 @@ export default function PositionList() {
     },
     {
       title: '招录对象',
-      dataIndex: '招录对象',
+      dataIndex: DATA_KEYS.TARGET,
       width: 120,
       ellipsis: true,
       render: (val) => (
@@ -298,7 +302,7 @@ export default function PositionList() {
           columns={columns}
           data={positions}
           pagination={false}
-          rowKey="职位代码"
+          rowKey={DATA_KEYS.CODE}
           scroll={{ x: 1200 }}
           noDataElement={
             <div style={{ textAlign: 'center', padding: '40px 0' }}>

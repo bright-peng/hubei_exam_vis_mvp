@@ -2,6 +2,7 @@ import React from 'react'
 import { Modal, Descriptions, Tag, Typography, Divider, Space, Button } from '@arco-design/web-react'
 import { IconInfoCircle } from '@arco-design/web-react/icon'
 import './PositionDetailModal.css'
+import { DATA_KEYS } from '../constants'
 
 const { Title, Text } = Typography
 
@@ -9,18 +10,18 @@ const PositionDetailModal = ({ position, onClose }) => {
   if (!position) return null
 
   const data = [
-    { label: '职位代码', value: <Text copyable bold>{position.职位代码}</Text> },
-    { label: '职位名称', value: <Text bold color="arcoblue">{position.职位名称}</Text> },
-    { label: '招录机关', value: position.招录机关 },
-    { label: '用人单位', value: position.用人单位 },
-    { label: '招录人数', value: <Tag color="blue">{position.招录人数}</Tag> },
-    { label: '招录对象', value: position.招录对象 || '不限' },
-    { label: '学历要求', value: position.学历 || '不限' },
-    { label: '学位要求', value: position.学位 || '不限' },
+    { label: '职位代码', value: <Text copyable bold>{position[DATA_KEYS.CODE]}</Text> },
+    { label: '职位名称', value: <Text bold color="arcoblue">{position[DATA_KEYS.NAME]}</Text> },
+    { label: '招录机关', value: position[DATA_KEYS.ORG] },
+    { label: '用人单位', value: position[DATA_KEYS.UNIT] },
+    { label: '招录人数', value: <Tag color="blue">{position[DATA_KEYS.QUOTA]}</Tag> },
+    { label: '招录对象', value: position[DATA_KEYS.TARGET] || '不限' },
+    { label: '学历要求', value: position[DATA_KEYS.EDUCATION] || '不限' },
+    { label: '学位要求', value: position[DATA_KEYS.DEGREE] || '不限' },
   ]
 
-  const competition = position.招录人数 > 0
-    ? (position.报名人数 / position.招录人数).toFixed(1)
+  const competition = position[DATA_KEYS.QUOTA] > 0
+    ? (position[DATA_KEYS.APPLICANTS] / position[DATA_KEYS.QUOTA]).toFixed(1)
     : 0
 
   return (
@@ -53,11 +54,11 @@ const PositionDetailModal = ({ position, onClose }) => {
         layout="horizontal"
         labelStyle={{ color: 'var(--text-secondary)', width: 100 }}
         data={[
-          { label: '职位简介', value: position.职位简介 || '暂无描述' },
-          { label: '研究生专业', value: position.研究生专业 || '不限' },
-          { label: '本科专业', value: position.本科专业 || '不限' },
-          { label: '专科专业', value: position.专科专业 || '不限' },
-          { label: '备注', value: <Text type="secondary">{position.备注 || '无'}</Text> },
+          { label: '职位简介', value: position[DATA_KEYS.INTRO] || '暂无描述' },
+          { label: '研究生专业', value: position[DATA_KEYS.MAJOR_PG] || '不限' },
+          { label: '本科专业', value: position[DATA_KEYS.MAJOR_UG] || '不限' },
+          { label: '专科专业', value: position[DATA_KEYS.MAJOR_OLD] || '不限' },
+          { label: '备注', value: <Text type="secondary">{position[DATA_KEYS.NOTES] || '无'}</Text> },
         ]}
       />
 
@@ -67,7 +68,7 @@ const PositionDetailModal = ({ position, onClose }) => {
       <div className="stats-container-arco">
         <div className="stat-item-arco">
           <div className="stat-label-arco">当前报名人数</div>
-          <div className="stat-value-arco highlight">{position.报名人数 || 0}</div>
+          <div className="stat-value-arco highlight">{position[DATA_KEYS.APPLICANTS] || 0}</div>
         </div>
         <div className="stat-item-arco">
           <div className="stat-label-arco">竞争比</div>

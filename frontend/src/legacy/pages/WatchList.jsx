@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { getPositionsByCodes, getTrendByCodes } from '../../api';
 import PositionDetailModal from '../../components/PositionDetailModal';
 import './WatchList.css';
+import { DATA_KEYS } from '../../constants';
 
 // Remove API_BASE definition as we will use imported functions
 // const API_BASE = 'http://localhost:8000'; deleted
@@ -127,16 +128,16 @@ function WatchList() {
 
   const sortedPositions = [...positions].sort((a, b) => {
     switch (sortBy) {
-      case 'applicants': return (b.报名人数 || 0) - (a.报名人数 || 0);
-      case 'ratio': return (b.竞争比 || 0) - (a.竞争比 || 0);
-      case 'quota': return (b.招录人数 || 0) - (a.招录人数 || 0);
+      case 'applicants': return (b[DATA_KEYS.APPLICANTS] || 0) - (a[DATA_KEYS.APPLICANTS] || 0);
+      case 'ratio': return (b[DATA_KEYS.RATIO] || 0) - (a[DATA_KEYS.RATIO] || 0);
+      case 'quota': return (b[DATA_KEYS.QUOTA] || 0) - (a[DATA_KEYS.QUOTA] || 0);
       default: return 0;
     }
   });
 
   const totalStats = positions.reduce((acc, pos) => ({
-    quota: acc.quota + (pos.招录人数 || 0),
-    applicants: acc.applicants + (pos.报名人数 || 0),
+    quota: acc.quota + (pos[DATA_KEYS.QUOTA] || 0),
+    applicants: acc.applicants + (pos[DATA_KEYS.APPLICANTS] || 0),
   }), { quota: 0, applicants: 0 });
 
   const avgRatio = totalStats.quota > 0 
@@ -275,23 +276,23 @@ function WatchList() {
                 </thead>
                 <tbody>
                   {sortedPositions.map((pos, index) => (
-                    <tr key={pos.职位代码}>
+                    <tr key={pos[DATA_KEYS.CODE]}>
                       <td className="col-index">{index + 1}</td>
-                      <td className="col-code">{pos.职位代码}</td>
-                      <td className="col-name">{pos.职位名称}</td>
-                      <td className="col-unit">{pos.用人单位}</td>
-                      <td className="col-quota">{pos.招录人数}</td>
-                      <td className="col-applicants highlight">{pos.报名人数?.toLocaleString()}</td>
+                      <td className="col-code">{pos[DATA_KEYS.CODE]}</td>
+                      <td className="col-name">{pos[DATA_KEYS.NAME]}</td>
+                      <td className="col-unit">{pos[DATA_KEYS.UNIT]}</td>
+                      <td className="col-quota">{pos[DATA_KEYS.QUOTA]}</td>
+                      <td className="col-applicants highlight">{pos[DATA_KEYS.APPLICANTS]?.toLocaleString()}</td>
                       <td className="col-ratio">
-                        <span className={`ratio-badge ${pos.竞争比 > 50 ? 'hot' : pos.竞争比 > 20 ? 'warm' : ''}`}>
-                          {pos.竞争比}:1
+                        <span className={`ratio-badge ${pos[DATA_KEYS.RATIO] > 50 ? 'hot' : pos[DATA_KEYS.RATIO] > 20 ? 'warm' : ''}`}>
+                          {pos[DATA_KEYS.RATIO]}:1
                         </span>
                       </td>
-                      <td className="col-major" title={pos.研究生专业}>{pos.研究生专业 || '不限'}</td>
-                      <td className="col-major" title={pos.本科专业}>{pos.本科专业 || '不限'}</td>
+                      <td className="col-major" title={pos[DATA_KEYS.MAJOR_PG]}>{pos[DATA_KEYS.MAJOR_PG] || '不限'}</td>
+                      <td className="col-major" title={pos[DATA_KEYS.MAJOR_UG]}>{pos[DATA_KEYS.MAJOR_UG] || '不限'}</td>
                       <td className="col-action">
                         <button className="btn-detail-small" onClick={() => setSelectedPosition(pos)}>详情</button>
-                        <button className="btn-remove" onClick={() => handleRemoveCode(pos.职位代码)} title="取消关注">✕</button>
+                        <button className="btn-remove" onClick={() => handleRemoveCode(pos[DATA_KEYS.CODE])} title="取消关注">✕</button>
                       </td>
                     </tr>
                   ))}

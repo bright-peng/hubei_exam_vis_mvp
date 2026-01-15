@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { DATA_KEYS } from './constants'
 
 // --- 配置区域 ---
 // 如果部署到 GitHub Pages (build 模式)，则为 true；本地开发 (dev 模式) 为 false
@@ -23,79 +24,98 @@ api.interceptors.response.use(
 export default api
 
 // --- 静态模式辅助函数 ---
-let positionsCache = {}  // Changed to object to cache by date
-let trendCache = null
+let positionsPromiseCache = {}  // Optimized: Cache promises to handle concurrent requests
+let trendPromise = null         // Optimized: Cache promise for trend data
 
-const loadStaticPositions = async (date = null) => {
+const loadStaticPositions = (date = null) => {
     // If no date specified, use '' as key for default/latest
     const cacheKey = date || ''
-    if (positionsCache[cacheKey]) return positionsCache[cacheKey]
 
-    try {
-        // Load date-specific file if date provided, else load default
-        const filename = date ? `positions_${date}.json` : 'positions.json'
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/' + filename)
-        positionsCache[cacheKey] = res.data.data
-        return positionsCache[cacheKey]
-    } catch (e) {
-        console.error("Failed to load static positions", e)
-        // Fallback to default if date-specific file doesn't exist
-        if (date && !positionsCache['']) {
-            const res = await axios.get(import.meta.env.BASE_URL + 'data/positions.json')
-            positionsCache[''] = res.data.data
-            return positionsCache['']
+    // Return existing promise if request is already in flight or completed
+    if (positionsPromiseCache[cacheKey]) return positionsPromiseCache[cacheKey]
+
+    const promise = (async () => {
+        try {
+            // Load date-specific file if date provided, else load default
+            const filename = date ? `positions_${date}.json` : 'positions.json'
+            const res = await axios.get(import.meta.env.BASE_URL + 'data/' + filename)
+            return res.data.data
+        } catch (e) {
+            console.error("Failed to load static positions", e)
+            // Fallback to default if date-specific file doesn't exist
+            if (date && cacheKey !== '') {
+                // Check if default is already loading/loaded
+                if (!positionsPromiseCache['']) {
+                    // Initiate default load if not available
+                    positionsPromiseCache[''] = (async () => {
+                        const res = await axios.get(import.meta.env.BASE_URL + 'data/positions.json')
+                        return res.data.data
+                    })()
+                }
+                return positionsPromiseCache['']
+            }
+            return []
         }
-        return positionsCache[''] || []
-    }
+    })()
+
+    positionsPromiseCache[cacheKey] = promise
+    return promise
 }
 
-const loadStaticTrends = async () => {
-    if (trendCache) return trendCache
-    try {
-        const res = await axios.get(import.meta.env.BASE_URL + 'data/trends_granular.json')
-        trendCache = res.data
-        return trendCache
-    } catch (e) {
-        console.error("Failed to load static trends", e)
-        return { dates: [], trends: {} }
-    }
+const loadStaticTrends = () => {
+    if (trendPromise) return trendPromise
+
+    trendPromise = (async () => {
+        try {
+            const res = await axios.get(import.meta.env.BASE_URL + 'data/trends_granular.json')
+            return res.data
+        } catch (e) {
+            console.error("Failed to load static trends", e)
+            return { dates: [], trends: {} }
+        }
+    })()
+
+    return trendPromise
 }
+
+// Helper for safe string comparison
+const safeStr = (val) => String(val || '').toLowerCase()
 
 // 通用筛选函数
 const filterPositions = (data, params) => {
     let result = [...data]
 
     if (params.city) {
-        result = result.filter(p => p['城市'] === params.city)
+        result = result.filter(p => p[DATA_KEYS.CITY] === params.city)
     }
     if (params.district) {
         // District match might be fuzzy or exact. 
         // In DB we stored full name "江岸区". Frontend passes full name.
-        result = result.filter(p => p['district'] === params.district || p['区县'] === params.district)
+        result = result.filter(p => p[DATA_KEYS.DISTRICT_MAP] === params.district || p[DATA_KEYS.DISTRICT] === params.district)
     }
     if (params.education) {
-        result = result.filter(p => p['学历'] === params.education)
+        result = result.filter(p => p[DATA_KEYS.EDUCATION] === params.education)
     }
     if (params.target) {
-        result = result.filter(p => p['招录对象'] === params.target)
+        result = result.filter(p => p[DATA_KEYS.TARGET] === params.target)
     }
     if (params.keyword) {
         const k = params.keyword.toLowerCase()
         result = result.filter(p =>
-            (p['职位代码'] && String(p['职位代码']).toLowerCase().includes(k)) ||
-            (p['职位名称'] && String(p['职位名称']).toLowerCase().includes(k)) ||
-            (p['招录机关'] && String(p['招录机关']).toLowerCase().includes(k)) ||
-            (p['用人单位'] && String(p['用人单位']).toLowerCase().includes(k)) ||
-            (p['城市'] && String(p['城市']).toLowerCase().includes(k)) ||
-            (p['区县'] && String(p['区县']).toLowerCase().includes(k)) ||
-            (p['学历'] && String(p['学历']).toLowerCase().includes(k)) ||
-            (p['学位'] && String(p['学位']).toLowerCase().includes(k)) ||
-            (p['专业'] && String(p['专业']).toLowerCase().includes(k)) || // Back compat
-            (p['本科专业'] && String(p['本科专业']).toLowerCase().includes(k)) ||
-            (p['研究生专业'] && String(p['研究生专业']).toLowerCase().includes(k)) ||
-            (p['招录对象'] && String(p['招录对象']).toLowerCase().includes(k)) ||
-            (p['职位简介'] && String(p['职位简介']).toLowerCase().includes(k)) ||
-            (p['备注'] && String(p['备注']).toLowerCase().includes(k))
+            safeStr(p[DATA_KEYS.CODE]).includes(k) ||
+            safeStr(p[DATA_KEYS.NAME]).includes(k) ||
+            safeStr(p[DATA_KEYS.ORG]).includes(k) ||
+            safeStr(p[DATA_KEYS.UNIT]).includes(k) ||
+            safeStr(p[DATA_KEYS.CITY]).includes(k) ||
+            safeStr(p[DATA_KEYS.DISTRICT]).includes(k) ||
+            safeStr(p[DATA_KEYS.EDUCATION]).includes(k) ||
+            safeStr(p[DATA_KEYS.DEGREE]).includes(k) ||
+            safeStr(p[DATA_KEYS.MAJOR_OLD]).includes(k) || // Back compat
+            safeStr(p[DATA_KEYS.MAJOR_UG]).includes(k) ||
+            safeStr(p[DATA_KEYS.MAJOR_PG]).includes(k) ||
+            safeStr(p[DATA_KEYS.TARGET]).includes(k) ||
+            safeStr(p[DATA_KEYS.INTRO]).includes(k) ||
+            safeStr(p[DATA_KEYS.NOTES]).includes(k)
         )
     }
     return result
@@ -127,7 +147,7 @@ export const getPositions = async (params) => {
         const filtered = filterPositions(all, params)
 
         // 排序：默认按报名人数降序
-        filtered.sort((a, b) => (b['报名人数'] || 0) - (a['报名人数'] || 0))
+        filtered.sort((a, b) => (b[DATA_KEYS.APPLICANTS] || 0) - (a[DATA_KEYS.APPLICANTS] || 0))
 
         // 分页
         const page = params.page || 1
@@ -155,13 +175,13 @@ export const getStatsByRegion = async (date) => {
         // Group by city
         const cityMap = {}
         positions.forEach(p => {
-            const city = p['城市'] || '未知'
+            const city = p[DATA_KEYS.CITY] || '未知'
             if (!cityMap[city]) {
                 cityMap[city] = { name: city, positions: 0, quota: 0, applicants: 0 }
             }
             cityMap[city].positions += 1
-            cityMap[city].quota += parseInt(p['招录人数']) || 0
-            cityMap[city].applicants += parseInt(p['报名人数']) || 0
+            cityMap[city].quota += parseInt(p[DATA_KEYS.QUOTA]) || 0
+            cityMap[city].applicants += parseInt(p[DATA_KEYS.APPLICANTS]) || 0
         })
 
         const cities = Object.values(cityMap)
@@ -193,7 +213,7 @@ export const getHotPositions = async (limit = 20, date = null) => {
     if (USE_STATIC_DATA) {
         const all = await loadStaticPositions(date)
         // 按报名人数降序
-        const sorted = [...all].sort((a, b) => (b['报名人数'] || 0) - (a['报名人数'] || 0))
+        const sorted = [...all].sort((a, b) => (b[DATA_KEYS.APPLICANTS] || 0) - (a[DATA_KEYS.APPLICANTS] || 0))
         return {
             data: sorted.slice(0, limit),
             date: date || "最新数据"
@@ -207,9 +227,9 @@ export const getColdPositions = async (limit = 20, date = null) => {
         const all = await loadStaticPositions(date)
         // 按报名人数升序，然后招录人数降序
         const sorted = [...all].sort((a, b) => {
-            const diff = (a['报名人数'] || 0) - (b['报名人数'] || 0)
+            const diff = (a[DATA_KEYS.APPLICANTS] || 0) - (b[DATA_KEYS.APPLICANTS] || 0)
             if (diff !== 0) return diff
-            return (b['招录人数'] || 0) - (a['招录人数'] || 0)
+            return (b[DATA_KEYS.QUOTA] || 0) - (a[DATA_KEYS.QUOTA] || 0)
         })
         return {
             data: sorted.slice(0, limit),
@@ -229,8 +249,8 @@ export const getSummary = async (date) => {
         if (date) {
             const positions = await loadStaticPositions(date)
             const total_positions = positions.length
-            const total_quota = positions.reduce((sum, p) => sum + (parseInt(p['招录人数']) || 0), 0)
-            const total_applicants = positions.reduce((sum, p) => sum + (parseInt(p['报名人数']) || 0), 0)
+            const total_quota = positions.reduce((sum, p) => sum + (parseInt(p[DATA_KEYS.QUOTA]) || 0), 0)
+            const total_applicants = positions.reduce((sum, p) => sum + (parseInt(p[DATA_KEYS.APPLICANTS]) || 0), 0)
 
             return {
                 ...baseSummary,
@@ -267,18 +287,18 @@ export const getWuhanDistricts = async (date) => {
     if (USE_STATIC_DATA) {
         // Compute from positions data for the specified date
         const positions = await loadStaticPositions(date)
-        const wuhanPositions = positions.filter(p => p['城市'] === '武汉市')
+        const wuhanPositions = positions.filter(p => p[DATA_KEYS.CITY] === '武汉市')
 
         // Group by district
         const districtMap = {}
         wuhanPositions.forEach(p => {
-            const district = p['district'] || '其他'
+            const district = p[DATA_KEYS.DISTRICT_MAP] || '其他'
             if (!districtMap[district]) {
                 districtMap[district] = { name: district, positions: 0, quota: 0, applicants: 0 }
             }
             districtMap[district].positions += 1
-            districtMap[district].quota += parseInt(p['招录人数']) || 0
-            districtMap[district].applicants += parseInt(p['报名人数']) || 0
+            districtMap[district].quota += parseInt(p[DATA_KEYS.QUOTA]) || 0
+            districtMap[district].applicants += parseInt(p[DATA_KEYS.APPLICANTS]) || 0
         })
 
         const wuhanData = Object.values(districtMap)
@@ -328,7 +348,7 @@ export const getPositionsByCodes = async (codes) => {
         const uniqueCodes = [...new Set(codes)]
 
         // Find positions
-        const filtered = all.filter(p => uniqueCodes.includes(String(p['职位代码'])))
+        const filtered = all.filter(p => uniqueCodes.includes(String(p[DATA_KEYS.CODE])))
 
         // Add trend/competiton info if needed, but getPositionsByCodes usually just returns detailed pos info
         // Main logic in backend: 
@@ -336,10 +356,10 @@ export const getPositionsByCodes = async (codes) => {
         // static data already has latest applicants count in '报名人数'
 
         // Sort by applicants desc
-        filtered.sort((a, b) => (b['报名人数'] || 0) - (a['报名人数'] || 0))
+        filtered.sort((a, b) => (b[DATA_KEYS.APPLICANTS] || 0) - (a[DATA_KEYS.APPLICANTS] || 0))
 
         // Check not found
-        const found = new Set(filtered.map(p => String(p['职位代码'])))
+        const found = new Set(filtered.map(p => String(p[DATA_KEYS.CODE])))
         const notFound = uniqueCodes.filter(c => !found.has(c))
 
         return {
@@ -364,8 +384,8 @@ export const getTrendByCodes = async (codes) => {
         const result = []
         for (const code of uniqueCodes) {
             // Find name
-            const pos = allPositions.find(p => String(p['职位代码']) === code)
-            const name = pos ? (pos['职位名称'] || code) : code
+            const pos = allPositions.find(p => String(p[DATA_KEYS.CODE]) === code)
+            const name = pos ? (pos[DATA_KEYS.NAME] || code) : code
 
             // Get data
             const data = trends[code] || new Array(dates.length).fill(0)

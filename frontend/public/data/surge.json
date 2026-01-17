@@ -6,29 +6,19 @@
       "unit": "沙洋县乡镇机关2",
       "city": "荆门市",
       "quota": 3,
-      "applicants_today": 712,
-      "applicants_prev": 534,
-      "delta": 178
+      "applicants_today": 895,
+      "applicants_prev": 712,
+      "delta": 183
     },
     {
-      "code": "14230202010006037",
-      "name": "乡镇综合岗5",
-      "unit": "公安县乡镇机关",
+      "code": "14230202010010059",
+      "name": "综合管理岗11",
+      "unit": "监利市乡镇机关",
       "city": "荆州市",
       "quota": 2,
-      "applicants_today": 452,
-      "applicants_prev": 333,
-      "delta": 119
-    },
-    {
-      "code": "14230202010011007",
-      "name": "综合管理岗",
-      "unit": "公安县乡镇机关",
-      "city": "荆州市",
-      "quota": 3,
-      "applicants_today": 133,
-      "applicants_prev": 15,
-      "delta": 118
+      "applicants_today": 527,
+      "applicants_prev": 399,
+      "delta": 128
     },
     {
       "code": "14230202001046007",
@@ -36,8 +26,18 @@
       "unit": "武汉市人社局所属单位",
       "city": "武汉市",
       "quota": 3,
-      "applicants_today": 397,
-      "applicants_prev": 280,
+      "applicants_today": 521,
+      "applicants_prev": 397,
+      "delta": 124
+    },
+    {
+      "code": "14230202016001058",
+      "name": "综合管理岗9",
+      "unit": "天门市乡镇（街道）",
+      "city": "天门市",
+      "quota": 5,
+      "applicants_today": 405,
+      "applicants_prev": 288,
       "delta": 117
     },
     {
@@ -46,169 +46,9 @@
       "unit": "房县九道乡人民政府",
       "city": "十堰市",
       "quota": 2,
-      "applicants_today": 402,
-      "applicants_prev": 285,
-      "delta": 117
-    },
-    {
-      "code": "14230202010010059",
-      "name": "综合管理岗11",
-      "unit": "监利市乡镇机关",
-      "city": "荆州市",
-      "quota": 2,
-      "applicants_today": 399,
-      "applicants_prev": 287,
-      "delta": 112
-    },
-    {
-      "code": "14230202001002020",
-      "name": "市场监管岗2",
-      "unit": "武汉市江汉区市场监督管理综合执法大队",
-      "city": "武汉市",
-      "quota": 2,
-      "applicants_today": 294,
-      "applicants_prev": 192,
-      "delta": 102
-    },
-    {
-      "code": "14230202001106026",
-      "name": "执法勤务岗16",
-      "unit": "武汉市公安局下属新城区分局",
-      "city": "武汉市",
-      "quota": 5,
-      "applicants_today": 326,
-      "applicants_prev": 227,
-      "delta": 99
-    },
-    {
-      "code": "14230201064000005",
-      "name": "综合管理岗",
-      "unit": "省水利厅 ",
-      "city": "省直",
-      "quota": 1,
-      "applicants_today": 336,
-      "applicants_prev": 241,
-      "delta": 95
-    },
-    {
-      "code": "14230202001105008",
-      "name": "公共服务岗",
-      "unit": "武汉市蔡甸区人民政府街道办事处",
-      "city": "武汉市",
-      "quota": 3,
-      "applicants_today": 170,
-      "applicants_prev": 75,
-      "delta": 95
-    },
-    {
-      "code": "14230202007009002",
-      "name": "综合管理岗",
-      "unit": "赤壁市乡镇（街道）机关",
-      "city": "咸宁市",
-      "quota": 2,
-      "applicants_today": 99,
-      "applicants_prev": 5,
-      "delta": 94
-    },
-    {
-      "code": "14230202001105014",
-      "name": "公共服务岗",
-      "unit": "武汉长江新区大潭办事处",
-      "city": "武汉市",
-      "quota": 1,
-      "applicants_today": 126,
-      "applicants_prev": 36,
-      "delta": 90
-    },
-    {
-      "code": "14230202010011006",
-      "name": "综合管理岗2",
-      "unit": "松滋市乡镇机关",
-      "city": "荆州市",
-      "quota": 3,
-      "applicants_today": 92,
-      "applicants_prev": 4,
-      "delta": 88
-    },
-    {
-      "code": "14230202010010058",
-      "name": "综合管理岗10",
-      "unit": "监利市乡镇机关",
-      "city": "荆州市",
-      "quota": 4,
-      "applicants_today": 248,
-      "applicants_prev": 161,
-      "delta": 87
-    },
-    {
-      "code": "14230201073000006",
-      "name": "综合管理岗",
-      "unit": "省纤维检验局荆州分局",
-      "city": "省直",
-      "quota": 1,
-      "applicants_today": 323,
-      "applicants_prev": 237,
-      "delta": 86
-    },
-    {
-      "code": "14230202013009006",
-      "name": "综合管理岗",
-      "unit": "鹤峰县市场监督管理局",
-      "city": "恩施土家族苗族自治州",
-      "quota": 1,
-      "applicants_today": 401,
-      "applicants_prev": 315,
-      "delta": 86
-    },
-    {
-      "code": "14230202001002005",
-      "name": "市场监管岗2",
-      "unit": "武汉市江汉区市场监管局",
-      "city": "武汉市",
-      "quota": 5,
-      "applicants_today": 322,
-      "applicants_prev": 237,
-      "delta": 85
-    },
-    {
-      "code": "14230202001005023",
-      "name": "执法勤务岗4",
-      "unit": "武汉市武昌区城市管理综合执法大队",
-      "city": "武汉市",
-      "quota": 4,
-      "applicants_today": 281,
-      "applicants_prev": 196,
-      "delta": 85
-    },
-    {
-      "code": "14230202001006019",
-      "name": "综合执法岗4",
-      "unit": "武汉市青山区城市管理综合执法大队",
-      "city": "武汉市",
-      "quota": 3,
-      "applicants_today": 234,
-      "applicants_prev": 152,
-      "delta": 82
-    },
-    {
-      "code": "14230202016002001",
-      "name": "综合管理岗11",
-      "unit": "天门市乡镇（街道）",
-      "city": "天门市",
-      "quota": 6,
-      "applicants_today": 161,
-      "applicants_prev": 80,
-      "delta": 81
-    },
-    {
-      "code": "14230202008009004",
-      "name": "综合管理岗",
-      "unit": "黄石经济技术开发区·铁山区乡镇人民政府",
-      "city": "黄石市",
-      "quota": 2,
-      "applicants_today": 124,
-      "applicants_prev": 45,
-      "delta": 79
+      "applicants_today": 511,
+      "applicants_prev": 402,
+      "delta": 109
     },
     {
       "code": "14230203001000149",
@@ -216,9 +56,39 @@
       "unit": "省武汉女子监狱",
       "city": "省直",
       "quota": 5,
-      "applicants_today": 332,
-      "applicants_prev": 255,
-      "delta": 77
+      "applicants_today": 440,
+      "applicants_prev": 332,
+      "delta": 108
+    },
+    {
+      "code": "14230202001002020",
+      "name": "市场监管岗2",
+      "unit": "武汉市江汉区市场监督管理综合执法大队",
+      "city": "武汉市",
+      "quota": 2,
+      "applicants_today": 399,
+      "applicants_prev": 294,
+      "delta": 105
+    },
+    {
+      "code": "14230202010006037",
+      "name": "乡镇综合岗5",
+      "unit": "公安县乡镇机关",
+      "city": "荆州市",
+      "quota": 2,
+      "applicants_today": 557,
+      "applicants_prev": 452,
+      "delta": 105
+    },
+    {
+      "code": "14230202013009006",
+      "name": "综合管理岗",
+      "unit": "鹤峰县市场监督管理局",
+      "city": "恩施土家族苗族自治州",
+      "quota": 1,
+      "applicants_today": 506,
+      "applicants_prev": 401,
+      "delta": 105
     },
     {
       "code": "14230202001005003",
@@ -226,59 +96,39 @@
       "unit": "武汉市武昌区教育局",
       "city": "武汉市",
       "quota": 1,
-      "applicants_today": 398,
-      "applicants_prev": 322,
-      "delta": 76
+      "applicants_today": 501,
+      "applicants_prev": 398,
+      "delta": 103
     },
     {
-      "code": "14230202009016010",
-      "name": "综合管理岗4",
-      "unit": "宜昌市夷陵区乡镇（街道）机关",
-      "city": "宜昌市",
-      "quota": 2,
-      "applicants_today": 116,
-      "applicants_prev": 41,
-      "delta": 75
-    },
-    {
-      "code": "14230202001009012",
-      "name": "财务会计岗",
-      "unit": "武汉市江夏区非税收入管理局",
+      "code": "14230202001106026",
+      "name": "执法勤务岗16",
+      "unit": "武汉市公安局下属新城区分局",
       "city": "武汉市",
-      "quota": 2,
-      "applicants_today": 303,
-      "applicants_prev": 229,
-      "delta": 74
-    },
-    {
-      "code": "14230202001105222",
-      "name": "公共服务岗",
-      "unit": "武汉市黄陂区木兰乡",
-      "city": "武汉市",
-      "quota": 1,
-      "applicants_today": 128,
-      "applicants_prev": 55,
-      "delta": 73
-    },
-    {
-      "code": "14230202013010012",
-      "name": "综合管理岗2",
-      "unit": "宣恩县乡镇机关",
-      "city": "恩施土家族苗族自治州",
-      "quota": 4,
-      "applicants_today": 152,
-      "applicants_prev": 79,
-      "delta": 73
-    },
-    {
-      "code": "14230202016001058",
-      "name": "综合管理岗9",
-      "unit": "天门市乡镇（街道）",
-      "city": "天门市",
       "quota": 5,
-      "applicants_today": 288,
-      "applicants_prev": 215,
-      "delta": 73
+      "applicants_today": 429,
+      "applicants_prev": 326,
+      "delta": 103
+    },
+    {
+      "code": "14230202001008010",
+      "name": "综合管理岗",
+      "unit": "武汉市蔡甸区人民政府街道办事处（乡镇人民政府）",
+      "city": "武汉市",
+      "quota": 3,
+      "applicants_today": 369,
+      "applicants_prev": 273,
+      "delta": 96
+    },
+    {
+      "code": "14230202001046006",
+      "name": "人社业务岗6",
+      "unit": "武汉市人社局所属单位",
+      "city": "武汉市",
+      "quota": 5,
+      "applicants_today": 332,
+      "applicants_prev": 242,
+      "delta": 90
     },
     {
       "code": "14230202007005014",
@@ -286,19 +136,169 @@
       "unit": "赤壁市乡镇（街道）机关",
       "city": "咸宁市",
       "quota": 5,
-      "applicants_today": 313,
-      "applicants_prev": 241,
-      "delta": 72
+      "applicants_today": 403,
+      "applicants_prev": 313,
+      "delta": 90
     },
     {
-      "code": "14230202001002025",
+      "code": "14230201073000006",
+      "name": "综合管理岗",
+      "unit": "省纤维检验局荆州分局",
+      "city": "省直",
+      "quota": 1,
+      "applicants_today": 412,
+      "applicants_prev": 323,
+      "delta": 89
+    },
+    {
+      "code": "14230202001044009",
+      "name": "执法勤务岗5",
+      "unit": "武汉市司法局所属戒毒单位",
+      "city": "武汉市",
+      "quota": 6,
+      "applicants_today": 161,
+      "applicants_prev": 76,
+      "delta": 85
+    },
+    {
+      "code": "14230202001009012",
+      "name": "财务会计岗",
+      "unit": "武汉市江夏区非税收入管理局",
+      "city": "武汉市",
+      "quota": 2,
+      "applicants_today": 387,
+      "applicants_prev": 303,
+      "delta": 84
+    },
+    {
+      "code": "14230202001106025",
+      "name": "执法勤务岗15",
+      "unit": "武汉市公安局下属新城区分局",
+      "city": "武汉市",
+      "quota": 5,
+      "applicants_today": 347,
+      "applicants_prev": 263,
+      "delta": 84
+    },
+    {
+      "code": "14230202011003070",
+      "name": "综合管理岗2",
+      "unit": "汉川市仙女山街道办事处",
+      "city": "孝感市",
+      "quota": 1,
+      "applicants_today": 475,
+      "applicants_prev": 391,
+      "delta": 84
+    },
+    {
+      "code": "14230202001010014",
+      "name": "财政业务岗",
+      "unit": "武汉市东西湖区预算外资金管理办公室",
+      "city": "武汉市",
+      "quota": 2,
+      "applicants_today": 213,
+      "applicants_prev": 130,
+      "delta": 83
+    },
+    {
+      "code": "14230202001058001",
+      "name": "审计业务岗",
+      "unit": "武汉市审计局",
+      "city": "武汉市",
+      "quota": 4,
+      "applicants_today": 271,
+      "applicants_prev": 188,
+      "delta": 83
+    },
+    {
+      "code": "14230202001004008",
+      "name": "规划建设岗",
+      "unit": "武汉市汉阳区住更局",
+      "city": "武汉市",
+      "quota": 2,
+      "applicants_today": 396,
+      "applicants_prev": 315,
+      "delta": 81
+    },
+    {
+      "code": "14230202011003087",
+      "name": "乡镇综合岗1",
+      "unit": "汉川市田二河镇人民政府",
+      "city": "孝感市",
+      "quota": 1,
+      "applicants_today": 165,
+      "applicants_prev": 87,
+      "delta": 78
+    },
+    {
+      "code": "14230202001005023",
+      "name": "执法勤务岗4",
+      "unit": "武汉市武昌区城市管理综合执法大队",
+      "city": "武汉市",
+      "quota": 4,
+      "applicants_today": 358,
+      "applicants_prev": 281,
+      "delta": 77
+    },
+    {
+      "code": "14230202001006019",
       "name": "综合执法岗4",
-      "unit": "武汉市江汉区城市管理综合执法大队",
+      "unit": "武汉市青山区城市管理综合执法大队",
       "city": "武汉市",
       "quota": 3,
-      "applicants_today": 179,
-      "applicants_prev": 108,
-      "delta": 71
+      "applicants_today": 311,
+      "applicants_prev": 234,
+      "delta": 77
+    },
+    {
+      "code": "14230202007003006",
+      "name": "综合管理岗2",
+      "unit": "咸宁市咸安区乡镇（街道）机关",
+      "city": "咸宁市",
+      "quota": 2,
+      "applicants_today": 320,
+      "applicants_prev": 243,
+      "delta": 77
+    },
+    {
+      "code": "14230202001004011",
+      "name": "综合管理岗",
+      "unit": "武汉市汉阳区行政审批局",
+      "city": "武汉市",
+      "quota": 1,
+      "applicants_today": 273,
+      "applicants_prev": 197,
+      "delta": 76
+    },
+    {
+      "code": "14230202010010058",
+      "name": "综合管理岗10",
+      "unit": "监利市乡镇机关",
+      "city": "荆州市",
+      "quota": 4,
+      "applicants_today": 324,
+      "applicants_prev": 248,
+      "delta": 76
+    },
+    {
+      "code": "14230202001002004",
+      "name": "市场监管岗1",
+      "unit": "武汉市江汉区市场监管局",
+      "city": "武汉市",
+      "quota": 5,
+      "applicants_today": 247,
+      "applicants_prev": 172,
+      "delta": 75
+    },
+    {
+      "code": "14230202001005015",
+      "name": "市场监管岗1",
+      "unit": "武汉市武昌区市场监管局",
+      "city": "武汉市",
+      "quota": 3,
+      "applicants_today": 282,
+      "applicants_prev": 207,
+      "delta": 75
     }
   ],
   "wuhan": [
@@ -308,9 +308,9 @@
       "unit": "武汉市人社局所属单位",
       "district": "市直",
       "quota": 3,
-      "applicants_today": 397,
-      "applicants_prev": 280,
-      "delta": 117
+      "applicants_today": 521,
+      "applicants_prev": 397,
+      "delta": 124
     },
     {
       "code": "14230202001002020",
@@ -318,69 +318,9 @@
       "unit": "武汉市江汉区市场监督管理综合执法大队",
       "district": "江汉区",
       "quota": 2,
-      "applicants_today": 294,
-      "applicants_prev": 192,
-      "delta": 102
-    },
-    {
-      "code": "14230202001106026",
-      "name": "执法勤务岗16",
-      "unit": "武汉市公安局下属新城区分局",
-      "district": "市直",
-      "quota": 5,
-      "applicants_today": 326,
-      "applicants_prev": 227,
-      "delta": 99
-    },
-    {
-      "code": "14230202001105008",
-      "name": "公共服务岗",
-      "unit": "武汉市蔡甸区人民政府街道办事处",
-      "district": "市直",
-      "quota": 3,
-      "applicants_today": 170,
-      "applicants_prev": 75,
-      "delta": 95
-    },
-    {
-      "code": "14230202001105014",
-      "name": "公共服务岗",
-      "unit": "武汉长江新区大潭办事处",
-      "district": "市直",
-      "quota": 1,
-      "applicants_today": 126,
-      "applicants_prev": 36,
-      "delta": 90
-    },
-    {
-      "code": "14230202001002005",
-      "name": "市场监管岗2",
-      "unit": "武汉市江汉区市场监管局",
-      "district": "江汉区",
-      "quota": 5,
-      "applicants_today": 322,
-      "applicants_prev": 237,
-      "delta": 85
-    },
-    {
-      "code": "14230202001005023",
-      "name": "执法勤务岗4",
-      "unit": "武汉市武昌区城市管理综合执法大队",
-      "district": "武昌区",
-      "quota": 4,
-      "applicants_today": 281,
-      "applicants_prev": 196,
-      "delta": 85
-    },
-    {
-      "code": "14230202001006019",
-      "name": "综合执法岗4",
-      "unit": "武汉市青山区城市管理综合执法大队",
-      "district": "青山区",
-      "quota": 3,
-      "applicants_today": 234,
-      "applicants_prev": 152,
-      "delta": 82
+      "applicants_today": 399,
+      "applicants_prev": 294,
+      "delta": 105
     },
     {
       "code": "14230202001005003",
@@ -388,69 +328,19 @@
       "unit": "武汉市武昌区教育局",
       "district": "武昌区",
       "quota": 1,
-      "applicants_today": 398,
-      "applicants_prev": 322,
-      "delta": 76
+      "applicants_today": 501,
+      "applicants_prev": 398,
+      "delta": 103
     },
     {
-      "code": "14230202001009012",
-      "name": "财务会计岗",
-      "unit": "武汉市江夏区非税收入管理局",
-      "district": "江夏区",
-      "quota": 2,
-      "applicants_today": 303,
-      "applicants_prev": 229,
-      "delta": 74
-    },
-    {
-      "code": "14230202001105222",
-      "name": "公共服务岗",
-      "unit": "武汉市黄陂区木兰乡",
-      "district": "市直",
-      "quota": 1,
-      "applicants_today": 128,
-      "applicants_prev": 55,
-      "delta": 73
-    },
-    {
-      "code": "14230202001002025",
-      "name": "综合执法岗4",
-      "unit": "武汉市江汉区城市管理综合执法大队",
-      "district": "江汉区",
-      "quota": 3,
-      "applicants_today": 179,
-      "applicants_prev": 108,
-      "delta": 71
-    },
-    {
-      "code": "14230202001004011",
-      "name": "综合管理岗",
-      "unit": "武汉市汉阳区行政审批局",
-      "district": "汉阳区",
-      "quota": 1,
-      "applicants_today": 197,
-      "applicants_prev": 129,
-      "delta": 68
-    },
-    {
-      "code": "14230202001046006",
-      "name": "人社业务岗6",
-      "unit": "武汉市人社局所属单位",
+      "code": "14230202001106026",
+      "name": "执法勤务岗16",
+      "unit": "武汉市公安局下属新城区分局",
       "district": "市直",
       "quota": 5,
-      "applicants_today": 242,
-      "applicants_prev": 175,
-      "delta": 67
-    },
-    {
-      "code": "14230202001060003",
-      "name": "财务会计岗",
-      "unit": "武汉市住房和城市更新局",
-      "district": "市直",
-      "quota": 1,
-      "applicants_today": 210,
-      "applicants_prev": 143,
-      "delta": 67
+      "applicants_today": 429,
+      "applicants_prev": 326,
+      "delta": 103
     },
     {
       "code": "14230202001008010",
@@ -458,9 +348,39 @@
       "unit": "武汉市蔡甸区人民政府街道办事处（乡镇人民政府）",
       "district": "蔡甸区",
       "quota": 3,
-      "applicants_today": 273,
-      "applicants_prev": 208,
-      "delta": 65
+      "applicants_today": 369,
+      "applicants_prev": 273,
+      "delta": 96
+    },
+    {
+      "code": "14230202001046006",
+      "name": "人社业务岗6",
+      "unit": "武汉市人社局所属单位",
+      "district": "市直",
+      "quota": 5,
+      "applicants_today": 332,
+      "applicants_prev": 242,
+      "delta": 90
+    },
+    {
+      "code": "14230202001044009",
+      "name": "执法勤务岗5",
+      "unit": "武汉市司法局所属戒毒单位",
+      "district": "市直",
+      "quota": 6,
+      "applicants_today": 161,
+      "applicants_prev": 76,
+      "delta": 85
+    },
+    {
+      "code": "14230202001009012",
+      "name": "财务会计岗",
+      "unit": "武汉市江夏区非税收入管理局",
+      "district": "江夏区",
+      "quota": 2,
+      "applicants_today": 387,
+      "applicants_prev": 303,
+      "delta": 84
     },
     {
       "code": "14230202001106025",
@@ -468,19 +388,19 @@
       "unit": "武汉市公安局下属新城区分局",
       "district": "市直",
       "quota": 5,
-      "applicants_today": 263,
-      "applicants_prev": 198,
-      "delta": 65
+      "applicants_today": 347,
+      "applicants_prev": 263,
+      "delta": 84
     },
     {
-      "code": "14230202001007015",
-      "name": "综合执法岗2",
-      "unit": "武汉市洪山区城市管理综合执法大队",
-      "district": "洪山区",
-      "quota": 3,
-      "applicants_today": 145,
-      "applicants_prev": 81,
-      "delta": 64
+      "code": "14230202001010014",
+      "name": "财政业务岗",
+      "unit": "武汉市东西湖区预算外资金管理办公室",
+      "district": "东西湖区",
+      "quota": 2,
+      "applicants_today": 213,
+      "applicants_prev": 130,
+      "delta": 83
     },
     {
       "code": "14230202001058001",
@@ -488,9 +408,9 @@
       "unit": "武汉市审计局",
       "district": "市直",
       "quota": 4,
-      "applicants_today": 188,
-      "applicants_prev": 125,
-      "delta": 63
+      "applicants_today": 271,
+      "applicants_prev": 188,
+      "delta": 83
     },
     {
       "code": "14230202001004008",
@@ -498,11 +418,91 @@
       "unit": "武汉市汉阳区住更局",
       "district": "汉阳区",
       "quota": 2,
-      "applicants_today": 315,
-      "applicants_prev": 255,
-      "delta": 60
+      "applicants_today": 396,
+      "applicants_prev": 315,
+      "delta": 81
+    },
+    {
+      "code": "14230202001005023",
+      "name": "执法勤务岗4",
+      "unit": "武汉市武昌区城市管理综合执法大队",
+      "district": "武昌区",
+      "quota": 4,
+      "applicants_today": 358,
+      "applicants_prev": 281,
+      "delta": 77
+    },
+    {
+      "code": "14230202001006019",
+      "name": "综合执法岗4",
+      "unit": "武汉市青山区城市管理综合执法大队",
+      "district": "青山区",
+      "quota": 3,
+      "applicants_today": 311,
+      "applicants_prev": 234,
+      "delta": 77
+    },
+    {
+      "code": "14230202001004011",
+      "name": "综合管理岗",
+      "unit": "武汉市汉阳区行政审批局",
+      "district": "汉阳区",
+      "quota": 1,
+      "applicants_today": 273,
+      "applicants_prev": 197,
+      "delta": 76
+    },
+    {
+      "code": "14230202001002004",
+      "name": "市场监管岗1",
+      "unit": "武汉市江汉区市场监管局",
+      "district": "江汉区",
+      "quota": 5,
+      "applicants_today": 247,
+      "applicants_prev": 172,
+      "delta": 75
+    },
+    {
+      "code": "14230202001005015",
+      "name": "市场监管岗1",
+      "unit": "武汉市武昌区市场监管局",
+      "district": "武昌区",
+      "quota": 3,
+      "applicants_today": 282,
+      "applicants_prev": 207,
+      "delta": 75
+    },
+    {
+      "code": "14230202001002005",
+      "name": "市场监管岗2",
+      "unit": "武汉市江汉区市场监管局",
+      "district": "江汉区",
+      "quota": 5,
+      "applicants_today": 396,
+      "applicants_prev": 322,
+      "delta": 74
+    },
+    {
+      "code": "14230202001002025",
+      "name": "综合执法岗4",
+      "unit": "武汉市江汉区城市管理综合执法大队",
+      "district": "江汉区",
+      "quota": 3,
+      "applicants_today": 252,
+      "applicants_prev": 179,
+      "delta": 73
+    },
+    {
+      "code": "14230202001005027",
+      "name": "综合管理岗",
+      "unit": "武汉市武昌区人民政府徐家棚街道办事处",
+      "district": "武昌区",
+      "quota": 1,
+      "applicants_today": 233,
+      "applicants_prev": 161,
+      "delta": 72
     }
   ],
-  "date": "2026-01-16",
-  "prev_date": "2026-01-15"
+  "date": "2026-01-17",
+  "prev_date": "2026-01-16"
 }

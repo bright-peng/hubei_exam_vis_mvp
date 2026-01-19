@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import * as echarts from 'echarts'
 import { getSummary, getHotPositions, getColdPositions, getTrend, getSurgePositions } from '../../api'
 import DateSelector from '../../components/DateSelector'
+import { DATA_KEYS } from '../../constants'
 import './Dashboard.css'
 import type { Position } from '../../types'
 
@@ -73,6 +74,10 @@ const Dashboard: React.FC = () => {
         getTrend().then((trendData) => {
             const chartDom = document.getElementById('mini-trend-chart')
             if (!chartDom) return
+
+            // Dispose old chart if exists
+            const existingChart = echarts.getInstanceByDom(chartDom)
+            if (existingChart) existingChart.dispose()
 
             const chart = echarts.init(chartDom)
             const data = Array.isArray(trendData?.data) ? trendData.data : []
@@ -243,17 +248,17 @@ const Dashboard: React.FC = () => {
                             <div className="empty-list">暂无数据</div>
                         ) : (
                             hotPositions.map((pos, idx) => (
-                                <div key={(getRecordValue(pos, '职位代码') as string) || idx} className="position-item">
+                                <div key={(getRecordValue(pos, DATA_KEYS.CODE) as string) || idx} className="position-item">
                                     <div className="position-rank hot">{idx + 1}</div>
                                     <div className="position-info">
-                                        <div className="position-name" title={(getRecordValue(pos, '职位名称') as string) || (getRecordValue(pos, '招录机关') as string)}>{(getRecordValue(pos, '职位名称') as string) || (getRecordValue(pos, '招录机关') as string)}</div>
-                                        <div className="position-unit" title={(getRecordValue(pos, '用人单位') as string) || ''}>{(getRecordValue(pos, '用人单位') as string) || ''}</div>
-                                        <div className="position-code">{getRecordValue(pos, '职位代码') as string}</div>
+                                        <div className="position-name" title={(getRecordValue(pos, DATA_KEYS.NAME) as string) || (getRecordValue(pos, DATA_KEYS.ORG) as string)}>{(getRecordValue(pos, DATA_KEYS.NAME) as string) || (getRecordValue(pos, DATA_KEYS.ORG) as string)}</div>
+                                        <div className="position-unit" title={(getRecordValue(pos, DATA_KEYS.UNIT) as string) || ''}>{(getRecordValue(pos, DATA_KEYS.UNIT) as string) || ''}</div>
+                                        <div className="position-code">{getRecordValue(pos, DATA_KEYS.CODE) as string}</div>
                                     </div>
                                     <div className="position-stats">
-                                        <div className="applicants">{(getRecordValue(pos, '报名人数') as number)?.toLocaleString() || 0}</div>
+                                        <div className="applicants">{(getRecordValue(pos, DATA_KEYS.APPLICANTS) as number)?.toLocaleString() || 0}</div>
                                         <div className="competition">
-                                            {(getRecordValue(pos, '竞争比') as number)?.toFixed(1) || 0}:1
+                                            {(getRecordValue(pos, DATA_KEYS.RATIO) as number)?.toFixed(1) || 0}:1
                                         </div>
                                     </div>
                                 </div>
@@ -272,17 +277,17 @@ const Dashboard: React.FC = () => {
                             <div className="empty-list">暂无数据</div>
                         ) : (
                             coldPositions.map((pos, idx) => (
-                                <div key={(getRecordValue(pos, '职位代码') as string) || idx} className="position-item">
+                                <div key={(getRecordValue(pos, DATA_KEYS.CODE) as string) || idx} className="position-item">
                                     <div className="position-rank cold">{idx + 1}</div>
                                     <div className="position-info">
-                                        <div className="position-name" title={(getRecordValue(pos, '职位名称') as string) || (getRecordValue(pos, '招录机关') as string)}>{(getRecordValue(pos, '职位名称') as string) || (getRecordValue(pos, '招录机关') as string)}</div>
-                                        <div className="position-unit" title={(getRecordValue(pos, '用人单位') as string) || ''}>{(getRecordValue(pos, '用人单位') as string) || ''}</div>
-                                        <div className="position-code">{getRecordValue(pos, '职位代码') as string}</div>
+                                        <div className="position-name" title={(getRecordValue(pos, DATA_KEYS.NAME) as string) || (getRecordValue(pos, DATA_KEYS.ORG) as string)}>{(getRecordValue(pos, DATA_KEYS.NAME) as string) || (getRecordValue(pos, DATA_KEYS.ORG) as string)}</div>
+                                        <div className="position-unit" title={(getRecordValue(pos, DATA_KEYS.UNIT) as string) || ''}>{(getRecordValue(pos, DATA_KEYS.UNIT) as string) || ''}</div>
+                                        <div className="position-code">{getRecordValue(pos, DATA_KEYS.CODE) as string}</div>
                                     </div>
                                     <div className="position-stats">
-                                        <div className="applicants">{(getRecordValue(pos, '报名人数') as number)?.toLocaleString() || 0}</div>
+                                        <div className="applicants">{(getRecordValue(pos, DATA_KEYS.APPLICANTS) as number)?.toLocaleString() || 0}</div>
                                         <div className="competition cold-text">
-                                            {(getRecordValue(pos, '招录人数') as number) || 1}人
+                                            {(getRecordValue(pos, DATA_KEYS.QUOTA) as number) || 1}人
                                         </div>
                                     </div>
                                 </div>

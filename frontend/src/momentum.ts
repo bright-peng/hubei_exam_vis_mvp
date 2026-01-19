@@ -138,3 +138,12 @@ export const getDailyMomentum = async (
 
     return runCalculation()
 }
+
+/**
+ * 安全获取动量值，兼容旧版缓存（number）和新版结构（MomentumItem）
+ */
+export const getMomentumValue = (data: MomentumItem | number | null | undefined): number => {
+    if (typeof data === 'number') return data
+    if (data && typeof data === 'object' && 'count' in data) return data.count
+    return 0
+}

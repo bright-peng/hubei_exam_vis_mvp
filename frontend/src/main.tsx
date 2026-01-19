@@ -14,16 +14,21 @@ document.body.setAttribute('arco-theme', 'dark')
 
 const CurrentApp = uiVersion === 'arco' ? App : AppLegacy
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter 
-      basename={import.meta.env.BASE_URL}
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}
-    >
-      <CurrentApp />
-    </BrowserRouter>
-  </React.StrictMode>
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+    throw new Error('Root element not found')
+}
+
+ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+        <BrowserRouter
+            basename={import.meta.env.BASE_URL}
+            future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+            }}
+        >
+            <CurrentApp />
+        </BrowserRouter>
+    </React.StrictMode>
 )

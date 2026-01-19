@@ -320,10 +320,20 @@ async def upload_daily(
 @app.get("/stats/dates")
 async def get_available_dates():
     """获取所有可用的报名数据日期列表"""
-    if not os.path.exists(DAILY_DIR):
-        return []
-    daily_files = sorted(os.listdir(DAILY_DIR))
-    return [f.replace('.xlsx', '') for f in daily_files]
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT date FROM applications ORDER BY date ASC")
+        dates = [row[0] for row in cursor.fetchall()]
+        conn.close()
+        return dates
+    except Exception as e:
+        print(f"Error fetching dates from DB: {e}")
+        # Fallback to file system if DB fails
+        if not os.path.exists(DAILY_DIR):
+            return []
+        daily_files = sorted(os.listdir(DAILY_DIR))
+        return [f.replace('.xlsx', '') for f in daily_files]
 
 
 @app.get("/positions")
@@ -859,4 +869,4 @@ async def get_momentum():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

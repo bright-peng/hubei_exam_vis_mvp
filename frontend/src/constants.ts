@@ -1,3 +1,4 @@
+/** 数据字段键名常量 */
 export const DATA_KEYS = {
     CODE: '职位代码',
     NAME: '职位名称',
@@ -17,4 +18,8 @@ export const DATA_KEYS = {
     QUOTA: '招录人数',
     APPLICANTS: '报名人数',
     RATIO: '竞争比',
-};
+} as const
+
+/** DATA_KEYS 的类型 */
+export type DataKeyType = typeof DATA_KEYS
+export type DataKeyValue = DataKeyType[keyof DataKeyType]

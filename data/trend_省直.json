@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "date": "2026-01-13",
+      "applicants": 2400,
+      "passed": 0
+    },
+    {
+      "date": "2026-01-14",
+      "applicants": 5696,
+      "passed": 0
+    },
+    {
+      "date": "2026-01-15",
+      "applicants": 8890,
+      "passed": 0
+    },
+    {
+      "date": "2026-01-16",
+      "applicants": 12816,
+      "passed": 0
+    },
+    {
+      "date": "2026-01-17",
+      "applicants": 17752,
+      "passed": 0
+    },
+    {
+      "date": "2026-01-18",
+      "applicants": 25268,
+      "passed": 0
+    }
+  ]
+}

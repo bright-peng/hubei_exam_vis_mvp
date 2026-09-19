@@ -1,0 +1,252 @@
+{
+  "province": [
+    {
+      "name": "仙桃市",
+      "positions": 92,
+      "quota": 137,
+      "applicants": 3073,
+      "competition_ratio": 22.4
+    },
+    {
+      "name": "十堰市",
+      "positions": 407,
+      "quota": 552,
+      "applicants": 14230,
+      "competition_ratio": 25.8
+    },
+    {
+      "name": "咸宁市",
+      "positions": 322,
+      "quota": 528,
+      "applicants": 10994,
+      "competition_ratio": 20.8
+    },
+    {
+      "name": "天门市",
+      "positions": 63,
+      "quota": 140,
+      "applicants": 3784,
+      "competition_ratio": 27.0
+    },
+    {
+      "name": "孝感市",
+      "positions": 529,
+      "quota": 720,
+      "applicants": 18744,
+      "competition_ratio": 26.0
+    },
+    {
+      "name": "宜昌市",
+      "positions": 329,
+      "quota": 509,
+      "applicants": 14187,
+      "competition_ratio": 27.9
+    },
+    {
+      "name": "恩施土家族苗族自治州",
+      "positions": 396,
+      "quota": 512,
+      "applicants": 14095,
+      "competition_ratio": 27.5
+    },
+    {
+      "name": "武汉市",
+      "positions": 407,
+      "quota": 796,
+      "applicants": 43266,
+      "competition_ratio": 54.4
+    },
+    {
+      "name": "潜江市",
+      "positions": 57,
+      "quota": 66,
+      "applicants": 1610,
+      "competition_ratio": 24.4
+    },
+    {
+      "name": "省直",
+      "positions": 541,
+      "quota": 1209,
+      "applicants": 25268,
+      "competition_ratio": 20.9
+    },
+    {
+      "name": "神农架林区",
+      "positions": 21,
+      "quota": 30,
+      "applicants": 608,
+      "competition_ratio": 20.3
+    },
+    {
+      "name": "荆州市",
+      "positions": 361,
+      "quota": 576,
+      "applicants": 16498,
+      "competition_ratio": 28.6
+    },
+    {
+      "name": "荆门市",
+      "positions": 276,
+      "quota": 409,
+      "applicants": 9192,
+      "competition_ratio": 22.5
+    },
+    {
+      "name": "襄阳市",
+      "positions": 522,
+      "quota": 610,
+      "applicants": 18076,
+      "competition_ratio": 29.6
+    },
+    {
+      "name": "鄂州市",
+      "positions": 83,
+      "quota": 98,
+      "applicants": 3591,
+      "competition_ratio": 36.6
+    },
+    {
+      "name": "随州市",
+      "positions": 185,
+      "quota": 212,
+      "applicants": 4880,
+      "competition_ratio": 23.0
+    },
+    {
+      "name": "黄冈市",
+      "positions": 445,
+      "quota": 621,
+      "applicants": 14226,
+      "competition_ratio": 22.9
+    },
+    {
+      "name": "黄石市",
+      "positions": 188,
+      "quota": 302,
+      "applicants": 7442,
+      "competition_ratio": 24.6
+    }
+  ],
+  "wuhan": [
+    {
+      "name": "东湖风景区",
+      "positions": 3,
+      "quota": 5,
+      "applicants": 336,
+      "competition_ratio": 67.2
+    },
+    {
+      "name": "东西湖区",
+      "positions": 19,
+      "quota": 25,
+      "applicants": 2104,
+      "competition_ratio": 84.2
+    },
+    {
+      "name": "其他",
+      "positions": 7,
+      "quota": 10,
+      "applicants": 605,
+      "competition_ratio": 60.5
+    },
+    {
+      "name": "市直",
+      "positions": 116,
+      "quota": 320,
+      "applicants": 14397,
+      "competition_ratio": 45.0
+    },
+    {
+      "name": "新洲区",
+      "positions": 44,
+      "quota": 57,
+      "applicants": 2532,
+      "competition_ratio": 44.4
+    },
+    {
+      "name": "武昌区",
+      "positions": 27,
+      "quota": 48,
+      "applicants": 3871,
+      "competition_ratio": 80.6
+    },
+    {
+      "name": "汉南区",
+      "positions": 18,
+      "quota": 21,
+      "applicants": 1376,
+      "competition_ratio": 65.5
+    },
+    {
+      "name": "汉阳区",
+      "positions": 19,
+      "quota": 31,
+      "applicants": 2269,
+      "competition_ratio": 73.2
+    },
+    {
+      "name": "江夏区",
+      "positions": 27,
+      "quota": 52,
+      "applicants": 3399,
+      "competition_ratio": 65.4
+    },
+    {
+      "name": "江岸区",
+      "positions": 18,
+      "quota": 28,
+      "applicants": 940,
+      "competition_ratio": 33.6
+    },
+    {
+      "name": "江汉区",
+      "positions": 28,
+      "quota": 66,
+      "applicants": 4143,
+      "competition_ratio": 62.8
+    },
+    {
+      "name": "洪山区",
+      "positions": 16,
+      "quota": 29,
+      "applicants": 1346,
+      "competition_ratio": 46.4
+    },
+    {
+      "name": "硚口区",
+      "positions": 19,
+      "quota": 29,
+      "applicants": 2008,
+      "competition_ratio": 69.2
+    },
+    {
+      "name": "蔡甸区",
+      "positions": 10,
+      "quota": 16,
+      "applicants": 1209,
+      "competition_ratio": 75.6
+    },
+    {
+      "name": "长江新区",
+      "positions": 5,
+      "quota": 11,
+      "applicants": 502,
+      "competition_ratio": 45.6
+    },
+    {
+      "name": "青山区",
+      "positions": 21,
+      "quota": 35,
+      "applicants": 1722,
+      "competition_ratio": 49.2
+    },
+    {
+      "name": "黄陂区",
+      "positions": 10,
+      "quota": 13,
+      "applicants": 507,
+      "competition_ratio": 39.0
+    }
+  ],
+  "date": "2026-01-18"
+}
